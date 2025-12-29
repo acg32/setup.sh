@@ -7,14 +7,21 @@
     update_cache: true
     cache_valid_time: 3600
 
-- name: Allow OpenSSH
+- name: Allow SSH (port 22)
   become: true
   ansible.builtin.ufw:
     rule: allow
-    name: OpenSSH
+    port: "22"
+    proto: tcp
 
 - name: Enable UFW with default deny
   become: true
   ansible.builtin.ufw:
     state: enabled
     policy: deny
+
+- name: Allow outgoing traffic
+  become: true
+  ansible.builtin.ufw:
+    direction: outgoing
+    policy: allow

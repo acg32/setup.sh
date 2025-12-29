@@ -5,13 +5,14 @@ nvidia:
   dist_name: ubuntu2404
 battery:
   enable_dell: false
+  use_power_profiles_daemon: false
 obsidian:
   git_repo: git@github.com:antoine-cha/my-vault.git
   vault_dir: "{{ ansible_env.HOME }}/obsidian-vault"
   update_vault: false
 gnome:
   term:
-    default_profile: Aci Custom
+    default_profile: Aci-Custom
 utils:
   btop:
     version: 1.3.0

@@ -19,6 +19,10 @@
     defaultBranch = main
 [fetch]
     prune = true
+[pull]
+    rebase = true
+[rebase]
+    autoStash = true
 [format]
     pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
 [pager]

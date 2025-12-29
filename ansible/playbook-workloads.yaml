@@ -1,10 +1,9 @@
 ---
-- name: Install personal extras
+- name: Install workloads
   hosts: all
   vars_files:
     - config.yaml
   roles:
     - preflight
-    - wine
-    - retroarch
+    - docker
     - summary

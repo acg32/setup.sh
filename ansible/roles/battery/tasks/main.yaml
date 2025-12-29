@@ -1,5 +1,5 @@
 ---
-- name: Install acpi, tlp & powertop
+- name: Install power tools (TLP path)
   become: true
   ansible.builtin.apt:
     name:
@@ -10,6 +10,7 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+  when: not (battery.use_power_profiles_daemon | default(false) | bool)
 
 - name: Enable TLP service
   become: true
@@ -17,6 +18,24 @@
     name: tlp
     enabled: true
     state: started
+  when: not (battery.use_power_profiles_daemon | default(false) | bool)
+
+- name: Install power-profiles-daemon
+  become: true
+  ansible.builtin.apt:
+    name: power-profiles-daemon
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: battery.use_power_profiles_daemon | default(false) | bool
+
+- name: Enable power-profiles-daemon service
+  become: true
+  ansible.builtin.systemd_service:
+    name: power-profiles-daemon
+    enabled: true
+    state: started
+  when: battery.use_power_profiles_daemon | default(false) | bool
 
 - name: Run Dell specific optimization
   ansible.builtin.include_tasks: dell.yaml
@@ -42,4 +61,3 @@
 #   become: true
 #   ansible.builtin.command:
 #     ifconfig docker0 down
-

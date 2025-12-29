@@ -1,0 +1,24 @@
+---
+- name: Assert Ubuntu 24+ host
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == "Ubuntu"
+      - ansible_facts.distribution_version is version("24.04", ">=")
+    fail_msg: "This playbook targets Ubuntu 24+ only."
+
+- name: Warn if chassis type does not look like a laptop
+  ansible.builtin.debug:
+    msg: "Chassis type does not look like a laptop: {{ chassis_list | join(', ') }}"
+  vars:
+    laptop_types:
+      - Laptop
+      - Notebook
+      - Portable
+      - Detachable
+      - Convertible
+    chassis_list: >-
+      {{
+        [ansible_facts.chassis_type] if ansible_facts.chassis_type is string
+        else (ansible_facts.chassis_type | default([]))
+      }}
+  when: (chassis_list | intersect(laptop_types) | length) == 0

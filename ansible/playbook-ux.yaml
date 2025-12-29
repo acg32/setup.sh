@@ -1,10 +1,11 @@
 ---
-- name: Install personal extras
+- name: Install UX defaults
   hosts: all
   vars_files:
     - config.yaml
   roles:
     - preflight
-    - wine
-    - retroarch
+    - dev-tools
+    - gnome
+    - battery
     - summary

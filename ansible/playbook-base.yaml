@@ -1,5 +1,5 @@
 ---
-- name: Install local machine
+- name: Install base system
   hosts: all
   vars_files:
     - config.yaml

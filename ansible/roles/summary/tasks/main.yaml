@@ -1,0 +1,4 @@
+---
+- name: Show applied roles
+  ansible.builtin.debug:
+    msg: "Roles applied in this play: {{ role_names | join(', ') }}"

@@ -136,3 +136,10 @@ set statusline+=\ Encoding:[%{&fileencoding?&fileencoding:'none'}]  " File encod
 set statusline+=%#StatusLineSplitter#%{g:lsplitter}
 set statusline+=%#StatusLineCoords#
 set statusline+=x:%3c,\ y:%3l/%L\ (%3p%%)  " Column number, line number/total lines
+
+" -------------------------------- "
+"         Local overrides
+" -------------------------------- "
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif

@@ -1,0 +1,9 @@
+---
+- name: Install unattended upgrades
+  become: true
+  ansible.builtin.apt:
+    name:
+      - unattended-upgrades
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

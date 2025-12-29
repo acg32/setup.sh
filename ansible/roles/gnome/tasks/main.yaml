@@ -17,8 +17,12 @@
 
 - name: Resolve default profile UUID
   ansible.builtin.set_fact:
-    gnome_profile_uuid: "{{ (parsed_dconf.stdout | from_json)[gnome.term.default_profile] }}"
-  when: gnome.term.default_profile is defined
+    gnome_profile_uuid: "{{ gnome_profiles[gnome.term.default_profile] }}"
+  vars:
+    gnome_profiles: "{{ parsed_dconf.stdout | from_json }}"
+  when:
+    - gnome.term.default_profile is defined
+    - gnome_profiles[gnome.term.default_profile] is defined
 
 - name: Set default profile
   ansible.builtin.command: >

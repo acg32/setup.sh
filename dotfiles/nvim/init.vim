@@ -135,3 +135,11 @@ set statusline+=\ Encoding:[%{&fileencoding?&fileencoding:'none'}]
 set statusline+=%#StatusLineSplitter#%{g:lsplitter}
 set statusline+=%#StatusLineCoords#
 set statusline+=x:%3c,\ y:%3l/%L\ (%3p%%)
+
+" -------------------------------
+" Local overrides
+" -------------------------------
+let s:local = stdpath('config') . '/init.local.vim'
+if filereadable(s:local)
+  execute 'source' s:local
+endif
