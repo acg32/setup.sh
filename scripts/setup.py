@@ -67,6 +67,7 @@ def main() -> None:
     console = Console()
 
     console.print(Panel.fit("Laptop Setup Runner", style="bold cyan"))
+    console.print("[bold magenta]Choose a profile and let the magic happen.[/bold magenta]")
 
     if args.profile:
         profile = args.profile
@@ -90,6 +91,7 @@ def main() -> None:
     if use_dotfiles:
         table.add_row("Dotfiles", "make dotfiles")
     console.print(table)
+    console.rule("[bold cyan]Execution")
 
     if not args.yes:
         if not questionary.confirm("Proceed?", default=True).ask():
@@ -101,10 +103,14 @@ def main() -> None:
 
     try:
         for target in PROFILES[profile]:
+            console.print(f"[bold yellow]→ Running:[/bold yellow] make {target}")
             run(["make", target], cwd=root)
+            console.print(f"[bold green]✓ Done:[/bold green] make {target}")
 
         if use_dotfiles:
+            console.print("[bold yellow]→ Running:[/bold yellow] make dotfiles")
             run(["make", "dotfiles"], cwd=root)
+            console.print("[bold green]✓ Done:[/bold green] make dotfiles")
     except subprocess.CalledProcessError as exc:
         console.print(
             Panel.fit(
@@ -115,7 +121,7 @@ def main() -> None:
         )
         raise SystemExit(1)
 
-    console.print("Done.", style="bold green")
+    console.print(Panel.fit("All set. Enjoy your fresh setup!", style="bold green"))
 
 
 if __name__ == "__main__":
