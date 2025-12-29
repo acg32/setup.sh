@@ -16,6 +16,7 @@ ansible-playbook --ask-become-pass -e user=$USER -i inventory.ini playbook-local
 - `firmware`: fwupd for firmware updates.
 - `docker`: Docker Engine + Compose with sane defaults.
 - `battery`: power tuning (TLP + powertop), with Dell-specific settings.
+- `gnome`: terminal profile defaults via dconf (optional).
 
 ## Playbooks
 - `playbook-local.yaml`: core OS setup (includes VS Code).

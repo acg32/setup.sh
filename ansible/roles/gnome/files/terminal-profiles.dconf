@@ -1,37 +1,31 @@
-[:988d7485-e01a-49c7-a43b-01ab6689c51c]
-visible-name='Aci Custom'
+[/]
+list=['4a973c90-2935-4459-9b20-cbf45d3e72c2']
+
+[:4a973c90-2935-4459-9b20-cbf45d3e72c2]
 allow-bold=true
-audible-bell=false
-background-color='rgb(0,2,3)'
-background-transparency-percent=12
+background-color='#0D0D19192626'
+background-transparency-percent=13
 bold-color='#B4B4E1E1FDFD'
 bold-color-same-as-fg=true
 cursor-background-color='#B4B4E1E1FDFD'
 cursor-colors-set=true
 cursor-foreground-color='#0D0D19192626'
-default-size-columns=120
-default-size-rows=44
-font='Hack Nerd Font 10'
-foreground-color='rgb(205,225,237)'
+font='Hack Nerd Font Mono 12'
+foreground-color='#B4B4E1E1FDFD'
 palette=['#363636363636', '#FFFF08088383', '#8383FFFF0808', '#FFFF83830808', '#08088383FFFF', '#83830808FFFF', '#0808FFFF8383', '#B6B6B6B6B6B6', '#424242424242', '#FFFF1E1E8E8E', '#8E8EFFFF1E1E', '#FFFF8E8E1E1E', '#1E1E8E8EFFFF', '#8E8E1E1EFFFF', '#1E1EFFFF8E8E', '#C2C2C2C2C2C2']
 use-system-font=false
 use-theme-background=false
 use-theme-colors=false
 use-theme-transparency=false
 use-transparent-background=true
+visible-name='Aci'
 
-[:1430663d-083b-4737-a7f5-8378cc8226d1]
-visible-name='Material Colors'
-foreground-color='#C3C3C7C7D1D1'
-palette=['#070736364141', '#EBEB60606B6B', '#C3C3E8E88D8D', '#F7F7EBEB9595', '#8080CBCBC3C3', '#FFFF24249090', '#AEAEDDDDFFFF', '#FFFFFFFFFFFF', '#00002B2B3636', '#EBEB60606B6B', '#C3C3E8E88D8D', '#F7F7EBEB9595', '#7D7DC6C6BFBF', '#6C6C7171C3C3', '#343443434D4D', '#FFFFFFFFFFFF']
-default-size-columns=100
-default-size-rows=28
+[:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+background-color='rgb(0,0,0)'
+font='Hack Nerd Font Mono 12'
+foreground-color='rgb(0,255,0)'
+login-shell=false
+palette=['rgb(0,0,0)', 'rgb(205,0,0)', 'rgb(0,205,0)', 'rgb(205,205,0)', 'rgb(0,0,238)', 'rgb(205,0,205)', 'rgb(0,205,205)', 'rgb(229,229,229)', 'rgb(127,127,127)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(255,255,0)', 'rgb(92,92,255)', 'rgb(255,0,255)', 'rgb(0,255,255)', 'rgb(255,255,255)']
 use-system-font=false
-use-theme-colors=false
-font='Hack Nerd Font 10'
-allow-bold=false
-bold-color-same-as-fg=true
-bold-color='#FFFFFFFFFFFF'
-background-color='#1E1E28282C2C'
-audible-bell=false
-scrollbar-policy='never'
+use-theme-colors=true
+visible-name='Main'

@@ -12,7 +12,6 @@ The host stays stable; experiments live in sandboxes.
 - `ansible/`: root-only playbooks and roles (Ubuntu).
 - `dotfiles/`: portable user config + install script.
 - `testing_env/`: Vagrant VM to validate Ansible.
-- `extras/`: optional, OS-specific extras.
 - `utils/`: shell helpers used by scripts.
 
 ## Quick start
