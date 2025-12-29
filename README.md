@@ -53,6 +53,12 @@ make ansible-personal
 - `make dotfiles`: link dotfiles.
 - `make verify`: check dotfile symlinks.
 
+## Interactive setup
+```bash
+./scripts/setup.py
+```
+Supports `--profile` and `--no-dotfiles` for automation.
+
 ## Docker conventions
 - Use containers for experiments; keep the host clean.
 - Bind-mount code from the host.

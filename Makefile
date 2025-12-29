@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-.PHONY: bootstrap ansible-base ansible-ux ansible-workloads ansible-personal dotfiles verify
+.PHONY: bootstrap ansible-base ansible-ux ansible-workloads ansible-personal dotfiles verify setup
 
 ANSIBLE := ansible-playbook --ask-become-pass -e user=$(USER) -i ansible/inventory.ini
 
@@ -24,3 +24,6 @@ dotfiles:
 
 verify:
 	$(MAKE) -C dotfiles verify
+
+setup:
+	./scripts/setup.py
