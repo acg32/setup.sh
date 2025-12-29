@@ -1,0 +1,49 @@
+[core]
+    editor = nvim
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    new = green bold
+[color "branch"]
+    current = yellow bold
+    local = white
+    remote = red
+[log]
+    date = relative
+[init]
+    defaultBranch = main
+[fetch]
+    prune = true
+[format]
+    pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
+[pager]
+    log = sh -c 'if command -v delta >/dev/null 2>&1; then exec delta --paging=always; else exec less -RFX; fi'
+    diff = sh -c 'if command -v delta >/dev/null 2>&1; then exec delta --paging=always; else exec less -RFX; fi'
+    show = sh -c 'if command -v delta >/dev/null 2>&1; then exec delta --paging=always; else exec less -RFX; fi'
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true
+    light = false
+    syntax-theme = Monokai Extended
+[merge]
+    conflictstyle = diff3
+[diff]
+    colorMoved = default
+[alias]
+    br = branch
+    bra = branch --all
+    brd = branch --delete
+    ci = commit
+    co = checkout
+    df = diff --color-words='[^[:space:]]'
+    fap = fetch --all --prune
+    graph = log --graph --oneline --decorate=short --branches='*'
+    sh = show --color-words='[^[]]'
+    st = status -sb
+[include]
+    path = ~/.gitconfig.local

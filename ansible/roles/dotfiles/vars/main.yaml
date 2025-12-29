@@ -1,6 +1,0 @@
----
-dotfiles_repo: "https://github.com/antoine-cha/my-funny-setup/"
-dotfiles_branch: "main"
-dotfiles_chezmoi_version: "2.43.0"
-dotfiles_chezmoi_archi: "amd64"
-dotfiles_chezmoi_url: "https://github.com/twpayne/chezmoi/releases/download/v{{ dotfiles_chezmoi_version }}/chezmoi_{{ dotfiles_chezmoi_version }}_linux_{{ dotfiles_chezmoi_archi }}.deb"

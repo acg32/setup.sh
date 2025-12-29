@@ -1,54 +1,16 @@
+# Ansible (Ubuntu root layer)
 
-# Ansible playbooks
+This playbook is intentionally small and only handles **root/OS tasks** on Ubuntu 24+.
+User preferences and dotfiles live in `dotfiles/`.
 
-Source of Rust utils: https://sts10.github.io/docs/rust-command-line-tools.html
-
-## Get started
-Execute locally with
-```Shell
+## Run locally
+```bash
 ansible-playbook --ask-become-pass -e user=$USER -i inventory.ini playbook-local.yaml
 ```
-## Utilities
 
-### User
-- vlc (from snap store on Ubuntu)
-- ffmpeg
-- pavucontrol
-- gthumb
+## Roles
+- `system-base`: base packages (curl, git, tmux, zsh, etc.).
+- `dev-tools`: optional CLI tools (ripgrep, fd, bat, eza, delta, jq).
+- `vscode`: optional Visual Studio Code install.
 
-### Pulseaudio settings
-Change `resample-method` in /etc/pulse/daemon.conf
-```
-#; resample-method = speex-float-1
-; resample-method = speex-float-5
-```
-
-### WebP and DDS images support
-Follow https://askubuntu.com/questions/617047/how-to-preview-dds-and-webp-images-on-nautilus
-Not necessary on Ubuntu 22.04 ??
-
-
-### Dev experience
-- tmux + config
-- neovim + config
-- fzf + config
-- ripgrep
-- exa
-- bat
-- diff-so-fancy ou delta
-- starship.rs
-- zsh
-### Dev
-- nvidia-drivers
-- docker
-- docker-compose
-
-### Basic set for servers
-- tree (or Rust equivalent)
-- htop
-- nvitop
-
-## Aliases
-Create useful aliases and store them cleanly
-- Docker
-- Rust utils
+Add or remove roles in `playbook-local.yaml` as needed.

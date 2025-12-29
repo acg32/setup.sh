@@ -1,0 +1,14 @@
+---
+- name: Install optional CLI tools
+  become: true
+  ansible.builtin.apt:
+    name:
+      - ripgrep
+      - fd-find
+      - bat
+      - eza
+      - git-delta
+      - jq
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

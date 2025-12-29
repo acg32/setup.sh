@@ -13,9 +13,9 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
 
-  config.vm.define "ubu22_test" do |host1|
+  config.vm.define "ubu24_test" do |host1|
     #host1.vm.box = "hashicorp/bionic64"
-    host1.vm.box = "generic/ubuntu2204"
+    host1.vm.box = "generic/ubuntu2404"
     host1.vm.provision "ansible" do |ansible|
       ansible.verbose = "v"
       ansible.playbook = "../ansible/playbook-local.yaml"  # Specify the correct playbook file path

@@ -1,0 +1,61 @@
+#!/bin/sh
+set -eu
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+MODE="${1:-full}"
+OS_NAME="$(uname -s)"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+link_file() {
+    src="$1"
+    dest="$2"
+
+    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+        mv "$dest" "${dest}.bak.$(date +%Y%m%d%H%M%S)"
+    fi
+    mkdir -p "$(dirname "$dest")"
+    ln -sfn "$src" "$dest"
+}
+
+seed_gitconfig_local() {
+    if [ ! -f "$HOME/.gitconfig.local" ] && [ -f "$ROOT/git/gitconfig.local.example" ]; then
+        cp "$ROOT/git/gitconfig.local.example" "$HOME/.gitconfig.local"
+    fi
+}
+
+install_common() {
+    link_file "$ROOT/git/gitconfig" "$HOME/.gitconfig"
+    link_file "$ROOT/zsh/zshrc" "$HOME/.zshrc"
+    seed_gitconfig_local
+}
+
+install_full() {
+    link_file "$ROOT/tmux/tmux.conf" "$HOME/.tmux.conf"
+    link_file "$ROOT/nvim/init.vim" "$CONFIG_HOME/nvim/init.vim"
+    link_file "$ROOT/starship/starship.toml" "$CONFIG_HOME/starship.toml"
+}
+
+case "$MODE" in
+    minimal)
+        install_common
+        ;;
+    linux)
+        install_common
+        install_full
+        ;;
+    macos)
+        install_common
+        install_full
+        ;;
+    full)
+        install_common
+        install_full
+        ;;
+    *)
+        echo "Unknown mode: $MODE" >&2
+        echo "Usage: $0 [full|minimal|linux|macos]" >&2
+        exit 1
+        ;;
+esac
+
+printf "Dotfiles installed (%s on %s)\n" "$MODE" "$OS_NAME"

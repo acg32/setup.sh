@@ -1,0 +1,28 @@
+---
+- name: Download Microsoft GPG key
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /tmp/microsoft.asc
+    mode: '0644'
+  register: microsoft_key
+
+- name: Dearmor Microsoft GPG key
+  become: true
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes --output /usr/share/keyrings/microsoft.gpg /tmp/microsoft.asc
+  when: microsoft_key.changed
+
+- name: Add VS Code repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main
+    filename: vscode
+    state: present
+
+- name: Install Visual Studio Code
+  become: true
+  ansible.builtin.apt:
+    name: code
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

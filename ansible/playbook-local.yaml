@@ -4,10 +4,8 @@
   vars_files:
     - config.yaml
   roles:
-    # - rust
-    # - utils-install
-    # - neovim
-    # - dotfiles
+    - system-base
+    # - dev-tools
     # - vscode
     # - docker
     # - btop
@@ -23,6 +21,6 @@
     # - syncthing
     # - wine
     # - paperless-ngx
-    - retroarch
+    # - retroarch
     # - latex
-    - battery
+    # - battery

@@ -1,5 +1,0 @@
----
-neovim_tag: v0.9.4
-neovim_url: "https://github.com/neovim/neovim/releases/download/{{ neovim_tag }}/nvim-linux64.tar.gz"
-neovim_release_dest: "{{ ansible_env.HOME }}/.local/share"
-neovim_bin_link_dest: "{{ ansible_env.HOME }}/.local/bin/nvim"
