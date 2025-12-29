@@ -4,15 +4,34 @@
     path: "/usr/bin/obsidian"
   register: obsidian_stat
 
+- name: Download Obsidian .deb
+  ansible.builtin.get_url:
+    url: "{{ obsidian_deb_url }}"
+    dest: /tmp/obsidian.deb
+    mode: '0644'
+
 - name: Install Obsidian from .deb
   when: not obsidian_stat.stat.exists
   become: true
   ansible.builtin.apt:
-    deb: "{{ obsidian_deb_url }}"
+    deb: /tmp/obsidian.deb
 
-- name: Clone git repo containing the vault
-  # Repeating the condition, to avoid pulling the repo mutliple times as each execution will change
-  when: not obsidian_stat.stat.exists
+- name: Check if vault exists
+  ansible.builtin.stat:
+    path: "{{ obsidian.vault_dir }}"
+  register: obsidian_vault
+
+- name: Clone vault repo
+  when: not obsidian_vault.stat.exists
   ansible.builtin.git:
     repo: "{{ obsidian.git_repo }}"
     dest: "{{ obsidian.vault_dir }}"
+
+- name: Update vault repo
+  when:
+    - obsidian_vault.stat.exists
+    - obsidian.update_vault | default(false) | bool
+  ansible.builtin.git:
+    repo: "{{ obsidian.git_repo }}"
+    dest: "{{ obsidian.vault_dir }}"
+    update: true

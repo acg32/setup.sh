@@ -164,6 +164,11 @@ Target state:
 - easy to reason about
 - reinstall OS → run Ansible → done
 
+Sensible defaults:
+- keep a single optional `dev-tools` role for common CLI niceties
+- keep it off by default in the playbook
+- never let it mutate user dotfiles or preferences
+
 ---
 
 ## Laptop-specific requirements

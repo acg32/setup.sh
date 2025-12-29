@@ -3,6 +3,7 @@
   become: true
   ansible.builtin.apt:
     name:
+      - btop
       - ripgrep
       - fd-find
       - bat

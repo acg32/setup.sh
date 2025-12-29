@@ -1,16 +1,28 @@
 ---
+- name: Ensure keyrings directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 - name: Import Docker GPG key
   become: true
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /etc/apt/trusted.gpg.d/docker.asc
+    dest: /etc/apt/keyrings/docker.asc
     mode: '0644'
     force: true
 
 - name: Add Docker repository
   become: true
-  ansible.builtin.apt_repository:
-    repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/ubuntu jammy stable
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: [deb]
+    uris: "https://download.docker.com/linux/ubuntu"
+    signed_by: /etc/apt/keyrings/docker.asc
+    suites: ["{{ ansible_distribution_release | lower }}"]
+    components: [stable]
     state: present
 
 - name: Install Docker tools
@@ -34,7 +46,7 @@
 - name: Add current user to the Docker group
   become: true
   ansible.builtin.user:
-    name: "{{ ansible_env.USER }}"
+    name: "{{ ansible_user_id }}"
     groups: docker
     append: true
 
@@ -48,18 +60,11 @@
     name: containerd.service
     enabled: true
 
-- name: Set up log rotation in /etc/docker/daemon.json
+- name: Configure Docker daemon.json
   become: true
-  lineinfile:
-    path: /etc/docker/daemon.json
-    line: |
-      {
-        "log-driver": "json-file",
-        "log-opts": {
-          "max-size": "10m",
-          "max-file": "5"
-        }
-      }
-    create: true
+  ansible.builtin.copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: '0644'
   notify:
     - Restart Docker Service

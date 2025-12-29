@@ -1,18 +1,29 @@
 ---
+- name: Ensure keyrings directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 - name: Add Syncthing GPG key
   become: true
   ansible.builtin.get_url:
     url: https://syncthing.net/release-key.txt
-    dest: /etc/apt/trusted.gpg.d/syncthing.asc
+    dest: /etc/apt/keyrings/syncthing.asc
     mode: '0644'
     force: true
 
 - name: Add Syncthing repository
   become: true
-  ansible.builtin.apt_repository:
-    repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/syncthing.asc] https://apt.syncthing.net/ syncthing stable
+  ansible.builtin.deb822_repository:
+    name: syncthing
+    types: [deb]
+    uris: "https://apt.syncthing.net/"
+    signed_by: /etc/apt/keyrings/syncthing.asc
+    suites: [syncthing]
+    components: [stable]
     state: present
-    filename: syncthing
 
 - name: Install Syncthing
   become: true

@@ -22,7 +22,7 @@ The host stays stable; experiments live in sandboxes.
 ansible-playbook --ask-become-pass -e user=$USER -i ansible/inventory.ini ansible/playbook-local.yaml
 ```
 
-Optional: enable `dev-tools` or `vscode` roles in `ansible/playbook-local.yaml`.
+Optional: enable `dev-tools`, `security`, `firmware`, or `docker` in `ansible/playbook-local.yaml`.
 
 ### 2) Install dotfiles
 ```bash
@@ -36,6 +36,11 @@ cd testing_env
 vagrant up
 ansible-playbook -i hosts ../ansible/playbook-local.yaml --ask-become-pass -e user=$USER
 vagrant halt
+```
+
+### 4) Personal extras (optional)
+```bash
+ansible-playbook --ask-become-pass -e user=$USER -i ansible/inventory.ini ansible/playbook-personal.yaml
 ```
 
 ## Docker conventions

@@ -1,0 +1,8 @@
+---
+- name: Install personal extras
+  hosts: all
+  vars_files:
+    - config.yaml
+  roles:
+    - wine
+    - retroarch

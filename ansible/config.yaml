@@ -1,13 +1,14 @@
 system:
   arch: x86_64
 nvidia:
-  driver_version: 535
-  dist_name: ubuntu2204
-  cuda_version: 12.2
-  cudnn_version: 8.9.7.*
+  driver_version: 550
+  dist_name: ubuntu2404
+battery:
+  enable_dell: false
 obsidian:
   git_repo: git@github.com:antoine-cha/my-vault.git
   vault_dir: "{{ ansible_env.HOME }}/obsidian-vault"
+  update_vault: false
 gnome:
   term:
     default_profile: Aci Custom

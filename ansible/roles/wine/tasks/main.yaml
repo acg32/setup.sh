@@ -3,6 +3,13 @@
   become: true
   ansible.builtin.command: dpkg --add-architecture i386
 
+- name: Ensure keyrings directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 - name: Import Wine GPG key
   become: true
   ansible.builtin.get_url:
@@ -11,10 +18,15 @@
     mode: '0644'
     force: true
 
-- name: Add WineHQ APT repository configuration
+- name: Add WineHQ repository
   become: true
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/winehq-archive.key] https://dl.winehq.org/wine-builds/ubuntu jammy main"
+  ansible.builtin.deb822_repository:
+    name: winehq
+    types: [deb]
+    uris: "https://dl.winehq.org/wine-builds/ubuntu"
+    signed_by: /etc/apt/keyrings/winehq-archive.key
+    suites: ["{{ ansible_distribution_release | lower }}"]
+    components: [main]
     state: present
 
 - name: Install WineHQ

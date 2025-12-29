@@ -10,6 +10,8 @@
       - git
       - gnupg
       - htop
+      - lsb-release
+      - openssh-client
       - tmux
       - tree
       - zsh

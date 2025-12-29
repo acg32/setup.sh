@@ -6,9 +6,10 @@
   roles:
     - system-base
     # - dev-tools
-    # - vscode
+    - vscode
+    # - security
+    # - firmware
     # - docker
-    # - btop
     # ======== #
     # GPU only #
     # ======== #
@@ -21,6 +22,4 @@
     # - syncthing
     # - wine
     # - paperless-ngx
-    # - retroarch
-    # - latex
     # - battery

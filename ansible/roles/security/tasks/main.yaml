@@ -1,0 +1,20 @@
+---
+- name: Install ufw
+  become: true
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Allow OpenSSH
+  become: true
+  ansible.builtin.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: Enable UFW with default deny
+  become: true
+  ansible.builtin.ufw:
+    state: enabled
+    policy: deny

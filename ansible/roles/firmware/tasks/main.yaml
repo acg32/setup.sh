@@ -1,9 +1,8 @@
 ---
-- name: Install NVIDIA driver
+- name: Install firmware update tools
   become: true
   ansible.builtin.apt:
-    name:
-      - "nvidia-driver-{{ nvidia.driver_version | default(550) }}"
+    name: fwupd
     state: present
     update_cache: true
     cache_valid_time: 3600

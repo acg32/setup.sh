@@ -1,16 +1,4 @@
 ---
-- name: Add linrunnner/tlp apt repository
-  become: true
-  ansible.builtin.deb822_repository:
-    name: tlp
-    types: [deb]
-    uris: "https://ppa.launchpadcontent.net/linrunner/tlp/ubuntu"
-    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2042f03c5fabd0ba2ced40412b3f92f902d65eff"
-    components: [main]
-    suites: ["{{ ansible_distribution_release | lower }}"]
-    state: present
-    enabled: true
-
 - name: Install acpi, tlp & powertop
   become: true
   ansible.builtin.apt:
@@ -23,9 +11,18 @@
     update_cache: true
     cache_valid_time: 3600
 
+- name: Enable TLP service
+  become: true
+  ansible.builtin.systemd_service:
+    name: tlp
+    enabled: true
+    state: started
+
 - name: Run Dell specific optimization
   ansible.builtin.include_tasks: dell.yaml
-  when: ansible_facts.chassis_vendor == "Dell Inc."
+  when:
+    - ansible_facts.chassis_vendor == "Dell Inc."
+    - battery.enable_dell | default(false) | bool
 
 - name: Disable Bluetooth in /etc/bluetooth/main.conf
   become: true
@@ -34,6 +31,8 @@
     regexp: '^AutoEnable=true'
     line: 'AutoEnable=false'
     state: present
+    backup: true
+  when: ansible_facts.os_family == "Debian"
 
 # # Does not work yet, this is not valid after reboot
 # # Does not work yet, this is not valid after reboot
@@ -43,5 +42,4 @@
 #   become: true
 #   ansible.builtin.command:
 #     ifconfig docker0 down
-
 

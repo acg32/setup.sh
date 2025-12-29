@@ -1,73 +1,26 @@
 ---
-# TODO: move these 2 steps to the bootstrap phase
-# - name: Install dconf role dependencies
-#   become: true
-#   ansible.builtin.apt:
-#     name:
-#       - libgirepository1.0-dev
-#       - gcc
-#       - libcairo2-dev
-#       - pkg-config
-#       - python3-dev
-#       - python3-pip
-#       - gir1.2-gtk-4.0
-#     state: present
-#     update_cache: true
-#     cache_valid_time: 3600
-
-# - name: Install python dependencies for system's Python
-#   ansible.builtin.pip:
-#     name:
-#       - psutil
-#       - pycairo
-#       - PyGObject
-#     executable: /usr/bin/pip
-
-- name: Dconf read gnome-terminal profiles
-  community.general.dconf:
-    key: "/org/gnome/terminal/legacy/profiles:/list"
-    state: read
-  register: profile_list
-
-- name: Transform output into list
-  ansible.builtin.set_fact:
-    initial_uuids: "{{ profile_list.value if profile_list.value else '[]' | from_yaml | unique }}"
-
 - name: Read custom dconf file
   ansible.builtin.slurp:
     src: "{{ playbook_dir }}/roles/gnome/files/terminal-profiles.dconf"
   register: dconf_file
 
+- name: Load terminal profiles
+  ansible.builtin.command: dconf load /org/gnome/terminal/legacy/profiles:/
+  args:
+    stdin: "{{ dconf_file['content'] | b64decode }}"
+
 - name: Extract UUIDs and visible names
   ansible.builtin.command: python3 {{ playbook_dir }}/roles/gnome/files/parse_dconf.py
   args:
     stdin: "{{ dconf_file['content'] | b64decode }}"
-  # Run this script locally
-  delegate_to: localhost
   register: parsed_dconf
 
-- name: Transform parsed output into dict
+- name: Resolve default profile UUID
   ansible.builtin.set_fact:
-    uuids_to_names: "{{ parsed_dconf.stdout | from_json }}"
-
-- name: Create final list of profiles UUIDS
-  ansible.builtin.set_fact:
-    final_uuids: "{{ (initial_uuids + (uuids_to_names.values() | list)) | unique | sort }}"
-
-- name: Add new UUIDs to the list of profiles
-  community.general.dconf:
-    key: "/org/gnome/terminal/legacy/profiles:/list"
-    value: "{{ final_uuids }}"
-    state: present
+    gnome_profile_uuid: "{{ (parsed_dconf.stdout | from_json)[gnome.term.default_profile] }}"
+  when: gnome.term.default_profile is defined
 
 - name: Set default profile
-  community.general.dconf:
-    key: "/org/gnome/terminal/legacy/profiles:/default"
-    value: "'{{ gnome.term.default_profile | extract(uuids_to_names) }}'"
-    state: present
-
-- name: Add new profiles to list
-  ansible.builtin.command: dconf load /org/gnome/terminal/legacy/profiles:/
-  args:
-    stdin: "{{ dconf_file['content'] | b64decode }}"
-  when: (initial_uuids | length) < (final_uuids | length)
+  ansible.builtin.command: >
+    dconf write /org/gnome/terminal/legacy/profiles:/default "'{{ gnome_profile_uuid }}'"
+  when: gnome_profile_uuid is defined
