@@ -25,10 +25,12 @@ seed_gitconfig_local() {
 
 install_common() {
     link_file "$ROOT/git/gitconfig" "$HOME/.gitconfig"
+    link_file "$ROOT/git/ignore" "$HOME/.config/git/ignore"
     link_file "$ROOT/zsh/zshrc" "$HOME/.zshrc"
     link_file "$ROOT/vim/vimrc" "$HOME/.vimrc"
     link_file "$ROOT/vim/colors" "$HOME/.vim/colors"
     link_file "$ROOT/shellcheckrc" "$HOME/.shellcheckrc"
+    link_file "$ROOT/inputrc" "$HOME/.inputrc"
     seed_gitconfig_local
 }
 
@@ -38,6 +40,10 @@ install_full() {
     link_file "$ROOT/starship/starship.toml" "$CONFIG_HOME/starship.toml"
     link_file "$ROOT/aliases" "$CONFIG_HOME/aliases"
     link_file "$ROOT/btop/btop.conf" "$CONFIG_HOME/btop/btop.conf"
+    link_file "$ROOT/bat/config" "$CONFIG_HOME/bat/config"
+    link_file "$ROOT/rg/rg.conf" "$CONFIG_HOME/rg/rg.conf"
+    link_file "$ROOT/fd/ignore" "$CONFIG_HOME/fd/ignore"
+    link_file "$ROOT/less/lesskey" "$CONFIG_HOME/less/lesskey"
 }
 
 case "$MODE" in

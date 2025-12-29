@@ -25,6 +25,10 @@ elif command -v vim >/dev/null 2>&1; then
     export EDITOR="vim"
 fi
 
+if [ -f "$HOME/.config/less/lesskey" ]; then
+    export LESS="-RFX"
+fi
+
 ##############################
 # Oh My Zsh (optional)
 ##############################

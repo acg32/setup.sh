@@ -1,0 +1,6 @@
+#command
+q quit
+Q quit
+
+#env
+LESS = -RFX

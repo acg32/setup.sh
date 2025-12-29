@@ -1,5 +1,6 @@
 [core]
     editor = nvim
+    excludesfile = ~/.config/git/ignore
 [color "status"]
     added = yellow
     changed = green

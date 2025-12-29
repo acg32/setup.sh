@@ -19,3 +19,5 @@ make minimal
 - Existing dotfiles are backed up with a `.bak.<timestamp>` suffix before linking.
 - Vim users get `~/.vimrc` + `~/.vim/colors` with a built-in colorscheme.
 - Optional aliases live in `~/.config/aliases/`.
+- Global ignore file is linked to `~/.config/git/ignore`.
+- Readline defaults are linked to `~/.inputrc`.
