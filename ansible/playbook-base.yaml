@@ -1,13 +1,14 @@
 ---
 - name: Install base system
   hosts: all
+  become: true
   vars_files:
     - config.yaml
   roles:
-    - preflight
-    - system-base
-    - vscode
+    - { role: preflight, tags: [preflight] }
+    - { role: system-base, tags: [base] }
+    - { role: vscode, tags: [vscode] }
     # - updates
-    - security
-    - firmware
-    - summary
+    - { role: security, tags: [security] }
+    - { role: firmware, tags: [firmware] }
+    - { role: summary, tags: [summary] }

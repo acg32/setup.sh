@@ -4,11 +4,6 @@
 # zmodload zsh/zprof
 
 ##############################
-# Core PATH and editor choice
-##############################
-export PATH="$HOME/.local/bin:$PATH"
-
-##############################
 # History
 ##############################
 HISTFILE="$HOME/.zsh_history"
@@ -78,6 +73,11 @@ fi
 if [ -f "$HOME/.config/aliases/common.sh" ]; then
     # shellcheck disable=SC1090
     . "$HOME/.config/aliases/common.sh"
+fi
+
+if [ -f "$HOME/.zshrc.local" ]; then
+    # shellcheck disable=SC1090
+    . "$HOME/.zshrc.local"
 fi
 
 ##############################

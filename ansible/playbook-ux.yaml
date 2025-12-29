@@ -1,11 +1,12 @@
 ---
 - name: Install UX defaults
   hosts: all
+  become: true
   vars_files:
     - config.yaml
   roles:
-    - preflight
-    - dev-tools
-    - gnome
-    - battery
-    - summary
+    - { role: preflight, tags: [preflight] }
+    - { role: dev-tools, tags: [dev-tools] }
+    - { role: gnome, tags: [gnome] }
+    - { role: battery, tags: [battery] }
+    - { role: summary, tags: [summary] }

@@ -18,7 +18,7 @@ The host stays stable; experiments live in sandboxes.
 ### 1) Install uv + Ansible and apply OS changes
 ```bash
 ./bootstrap.sh
-make ansible-base
+make setup
 ```
 
 Optional:

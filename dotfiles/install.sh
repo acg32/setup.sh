@@ -27,10 +27,12 @@ install_common() {
     link_file "$ROOT/git/gitconfig" "$HOME/.gitconfig"
     link_file "$ROOT/git/ignore" "$HOME/.config/git/ignore"
     link_file "$ROOT/zsh/zshrc" "$HOME/.zshrc"
+    link_file "$ROOT/zshenv" "$HOME/.zshenv"
     link_file "$ROOT/vim/vimrc" "$HOME/.vimrc"
     link_file "$ROOT/vim/colors" "$HOME/.vim/colors"
     link_file "$ROOT/shellcheckrc" "$HOME/.shellcheckrc"
     link_file "$ROOT/inputrc" "$HOME/.inputrc"
+    link_file "$ROOT/editorconfig" "$HOME/.editorconfig"
     seed_gitconfig_local
 }
 

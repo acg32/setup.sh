@@ -259,3 +259,8 @@ Result:
 - Keep developer UX portable: dotfiles are plain files + symlinks, no magic.
 - Keep workloads isolated: heavy stacks (CUDA, experiments) are not part of Ansible.
 - Keep taste optional: anything personal is opt-in and easy to remove.
+
+How to run now:
+```bash
+make setup
+```

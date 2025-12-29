@@ -1,10 +1,11 @@
 ---
 - name: Install personal extras
   hosts: all
+  become: true
   vars_files:
     - config.yaml
   roles:
-    - preflight
-    - wine
-    - retroarch
-    - summary
+    - { role: preflight, tags: [preflight] }
+    - { role: wine, tags: [wine] }
+    - { role: retroarch, tags: [retroarch] }
+    - { role: summary, tags: [summary] }

@@ -25,3 +25,13 @@
   ansible.builtin.ufw:
     direction: outgoing
     policy: allow
+
+- name: Show UFW status
+  become: true
+  ansible.builtin.command: ufw status verbose
+  register: ufw_status
+  changed_when: false
+
+- name: Display UFW status
+  ansible.builtin.debug:
+    msg: "{{ ufw_status.stdout_lines }}"

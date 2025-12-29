@@ -6,3 +6,5 @@
 - GNOME terminal profile captured and applied via Ansible.
 - Added root Makefile and dotfiles verify/uninstall helpers.
 - Added preflight checks and playbook summaries for safer runs.
+- Added interactive setup CLI and Makefile target.
+- Added editorconfig and local override hooks.

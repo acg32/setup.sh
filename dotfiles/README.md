@@ -31,3 +31,4 @@ make uninstall
 - Optional per-machine overrides:
   - `~/.vimrc.local`
   - `~/.config/nvim/init.local.vim`
+  - `~/.zshrc.local`

@@ -30,7 +30,13 @@ for uid, lines in profiles.items():
         break
 
 if not uuid:
-    sys.exit("Aci-Custom not found")
+    names = []
+    for uid, lines in profiles.items():
+        for l in lines:
+            if l.startswith("visible-name="):
+                names.append(l.split("=", 1)[1].strip().strip("'"))
+    names = ", ".join(sorted(set(names)))
+    sys.exit(f"Aci-Custom not found. Available: {names}")
 
 out = []
 out.append('[/]')

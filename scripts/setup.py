@@ -51,6 +51,16 @@ def main() -> None:
         default=None,
         help="Enable or disable dotfiles install.",
     )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Run without confirmation prompts.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show planned commands without running them.",
+    )
     args = parser.parse_args()
 
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,15 +91,29 @@ def main() -> None:
         table.add_row("Dotfiles", "make dotfiles")
     console.print(table)
 
-    if not questionary.confirm("Proceed?", default=True).ask():
-        console.print("Aborted.", style="yellow")
+    if not args.yes:
+        if not questionary.confirm("Proceed?", default=True).ask():
+            console.print("Aborted.", style="yellow")
+            return
+    if args.dry_run:
+        console.print("Dry run complete.", style="yellow")
         return
 
-    for target in PROFILES[profile]:
-        run(["make", target], cwd=root)
+    try:
+        for target in PROFILES[profile]:
+            run(["make", target], cwd=root)
 
-    if use_dotfiles:
-        run(["make", "dotfiles"], cwd=root)
+        if use_dotfiles:
+            run(["make", "dotfiles"], cwd=root)
+    except subprocess.CalledProcessError as exc:
+        console.print(
+            Panel.fit(
+                f"Step failed: {exc.cmd}\nExit code: {exc.returncode}",
+                title="Setup failed",
+                style="bold red",
+            )
+        )
+        raise SystemExit(1)
 
     console.print("Done.", style="bold green")
 

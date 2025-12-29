@@ -3,17 +3,29 @@
   ansible.builtin.slurp:
     src: "{{ playbook_dir }}/roles/gnome/files/terminal-profiles.dconf"
   register: dconf_file
+  become: false
+
+- name: Check dconf availability
+  ansible.builtin.command: dconf --version
+  register: dconf_version
+  changed_when: false
+  failed_when: false
+  become: false
 
 - name: Load terminal profiles
   ansible.builtin.command: dconf load /org/gnome/terminal/legacy/profiles:/
   args:
     stdin: "{{ dconf_file['content'] | b64decode }}"
+  when: dconf_version.rc == 0
+  become: false
 
 - name: Extract UUIDs and visible names
   ansible.builtin.command: python3 {{ playbook_dir }}/roles/gnome/files/parse_dconf.py
   args:
     stdin: "{{ dconf_file['content'] | b64decode }}"
   register: parsed_dconf
+  when: dconf_version.rc == 0
+  become: false
 
 - name: Resolve default profile UUID
   ansible.builtin.set_fact:
@@ -23,8 +35,13 @@
   when:
     - gnome.term.default_profile is defined
     - gnome_profiles[gnome.term.default_profile] is defined
+    - dconf_version.rc == 0
+  become: false
 
 - name: Set default profile
   ansible.builtin.command: >
     dconf write /org/gnome/terminal/legacy/profiles:/default "'{{ gnome_profile_uuid }}'"
-  when: gnome_profile_uuid is defined
+  when:
+    - gnome_profile_uuid is defined
+    - dconf_version.rc == 0
+  become: false

@@ -1,9 +1,10 @@
 ---
 - name: Install workloads
   hosts: all
+  become: true
   vars_files:
     - config.yaml
   roles:
-    - preflight
-    - docker
-    - summary
+    - { role: preflight, tags: [preflight] }
+    - { role: docker, tags: [docker] }
+    - { role: summary, tags: [summary] }

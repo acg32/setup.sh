@@ -1,5 +1,5 @@
 # Common aliases for all machines
-alias cm="chezmoi"
+alias setup="cd ~/code/setup.sh"
 
 # Aliases with eza
 alias l='eza -lah --color=always --icons --group-directories-first' # with headers
