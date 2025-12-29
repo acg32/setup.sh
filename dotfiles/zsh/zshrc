@@ -8,6 +8,17 @@
 ##############################
 export PATH="$HOME/.local/bin:$PATH"
 
+##############################
+# History
+##############################
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt append_history
+setopt share_history
+setopt hist_ignore_dups
+setopt hist_reduce_blanks
+
 if command -v nvim >/dev/null 2>&1; then
     export EDITOR="nvim"
 elif command -v vim >/dev/null 2>&1; then
@@ -55,6 +66,14 @@ fi
 ##############################
 if command -v starship >/dev/null 2>&1; then
     eval "$(starship init zsh)"
+fi
+
+##############################
+# Aliases (optional)
+##############################
+if [ -f "$HOME/.config/aliases/common.sh" ]; then
+    # shellcheck disable=SC1090
+    . "$HOME/.config/aliases/common.sh"
 fi
 
 ##############################

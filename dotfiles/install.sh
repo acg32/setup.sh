@@ -26,6 +26,9 @@ seed_gitconfig_local() {
 install_common() {
     link_file "$ROOT/git/gitconfig" "$HOME/.gitconfig"
     link_file "$ROOT/zsh/zshrc" "$HOME/.zshrc"
+    link_file "$ROOT/vim/vimrc" "$HOME/.vimrc"
+    link_file "$ROOT/vim/colors" "$HOME/.vim/colors"
+    link_file "$ROOT/shellcheckrc" "$HOME/.shellcheckrc"
     seed_gitconfig_local
 }
 
@@ -33,6 +36,8 @@ install_full() {
     link_file "$ROOT/tmux/tmux.conf" "$HOME/.tmux.conf"
     link_file "$ROOT/nvim/init.vim" "$CONFIG_HOME/nvim/init.vim"
     link_file "$ROOT/starship/starship.toml" "$CONFIG_HOME/starship.toml"
+    link_file "$ROOT/aliases" "$CONFIG_HOME/aliases"
+    link_file "$ROOT/btop/btop.conf" "$CONFIG_HOME/btop/btop.conf"
 }
 
 case "$MODE" in

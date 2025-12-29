@@ -17,3 +17,5 @@ make minimal
 - User identity lives in `~/.gitconfig.local` (auto-seeded on first install).
 - Optional tools (starship, oh-my-zsh, fzf, delta, ripgrep, fd, bat, eza, jq) are used when present.
 - Existing dotfiles are backed up with a `.bak.<timestamp>` suffix before linking.
+- Vim users get `~/.vimrc` + `~/.vim/colors` with a built-in colorscheme.
+- Optional aliases live in `~/.config/aliases/`.
