@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Install Ansible
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip ansible
+
+      - name: Shellcheck scripts
+        run: |
+          find scripts dotfiles ansible -name '*.sh' -print0 \
+            | xargs -0 shellcheck -x
+
+      - name: Ansible syntax check
+        run: |
+          ansible-playbook --syntax-check -i ansible/inventory.ini ansible/playbook-base.yaml
+          ansible-playbook --syntax-check -i ansible/inventory.ini ansible/playbook-ux.yaml
+          ansible-playbook --syntax-check -i ansible/inventory.ini ansible/playbook-workloads.yaml
+          ansible-playbook --syntax-check -i ansible/inventory.ini ansible/playbook-personal.yaml
