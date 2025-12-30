@@ -1,11 +1,11 @@
 SHELL := /bin/sh
 
-.PHONY: bootstrap ansible-base ansible-ux ansible-workloads ansible-personal dotfiles verify setup
+.PHONY: bootstrap ansible-base ansible-ux ansible-workloads ansible-personal dotfiles verify setup install
 
 ANSIBLE := ansible-playbook --ask-become-pass -e user=$(USER) -i ansible/inventory.ini
 
 bootstrap:
-	./bootstrap.sh
+	./scripts/bootstrap.sh
 
 ansible-base:
 	$(ANSIBLE) ansible/playbook-base.yaml
@@ -26,4 +26,12 @@ verify:
 	$(MAKE) -C dotfiles verify
 
 setup:
+	@command -v uv >/dev/null 2>&1 || { \
+		echo "uv not found. Run 'make install' or './scripts/bootstrap.sh' first."; \
+		exit 1; \
+	}
 	./scripts/setup.py
+
+install:
+	./scripts/bootstrap.sh
+	$(MAKE) setup

@@ -1,4 +1,18 @@
 ---
+- name: Remove legacy TLP PPA on Noble
+  become: true
+  ansible.builtin.apt_repository:
+    repo: ppa:linrunner/tlp
+    state: absent
+  when: ansible_distribution_release == "noble"
+
+- name: Remove legacy TLP deb822 source on Noble
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/tlp.sources
+    state: absent
+  when: ansible_distribution_release == "noble"
+
 - name: Install power tools (TLP path)
   become: true
   ansible.builtin.apt:

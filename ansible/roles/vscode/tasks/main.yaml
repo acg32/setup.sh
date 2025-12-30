@@ -1,4 +1,11 @@
 ---
+- name: Ensure keyrings directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 - name: Download Microsoft GPG key
   ansible.builtin.get_url:
     url: https://packages.microsoft.com/keys/microsoft.asc
@@ -6,17 +13,34 @@
     mode: '0644'
   register: microsoft_key
 
+- name: Check Microsoft keyring
+  become: true
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/microsoft.gpg
+  register: microsoft_keyring
+
 - name: Dearmor Microsoft GPG key
   become: true
   ansible.builtin.command:
-    cmd: gpg --dearmor --yes --output /usr/share/keyrings/microsoft.gpg /tmp/microsoft.asc
-  when: microsoft_key.changed
+    cmd: gpg --dearmor --yes --output /etc/apt/keyrings/microsoft.gpg /tmp/microsoft.asc
+  when: microsoft_key.changed or not microsoft_keyring.stat.exists
+
+- name: Remove legacy VS Code list file
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/vscode.list
+    state: absent
 
 - name: Add VS Code repository
   become: true
-  ansible.builtin.apt_repository:
-    repo: deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main
-    filename: vscode
+  ansible.builtin.deb822_repository:
+    name: vscode
+    types: [deb]
+    uris: "https://packages.microsoft.com/repos/code"
+    signed_by: /etc/apt/keyrings/microsoft.gpg
+    suites: [stable]
+    components: [main]
+    architectures: [amd64]
     state: present
 
 - name: Install Visual Studio Code

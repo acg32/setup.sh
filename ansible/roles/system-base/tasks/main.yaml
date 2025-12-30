@@ -18,3 +18,32 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Check Google Chrome apt source list
+  become: true
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/google-chrome.list
+  register: google_chrome_list
+
+- name: Check Google Chrome deb822 source
+  become: true
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/google-chrome.sources
+  register: google_chrome_sources
+
+- name: Force amd64 for Google Chrome repo when i386 is enabled
+  become: true
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/google-chrome.list
+    regexp: '^deb\\s+(?!\\[arch=)'
+    replace: 'deb [arch=amd64] '
+  when: google_chrome_list.stat.exists
+
+- name: Force amd64 for Google Chrome deb822 repo when i386 is enabled
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/apt/sources.list.d/google-chrome.sources
+    regexp: '^Architectures:'
+    line: 'Architectures: amd64'
+    insertafter: '^Types:'
+  when: google_chrome_sources.stat.exists
