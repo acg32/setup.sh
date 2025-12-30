@@ -4,16 +4,24 @@ set -eu
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
+color() {
+    code="$1"
+    shift
+    printf "\033[%sm%s\033[0m\n" "$code" "$*"
+}
+
 check_link() {
     src="$1"
     dest="$2"
 
     if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
-        printf "ok  %s -> %s\n" "$dest" "$src"
+        color "1;32" "✅  $dest → $src"
     else
-        printf "miss %s\n" "$dest"
+        color "1;31" "❌  $dest (missing)"
     fi
 }
+
+color "1;36" "✨ Dotfiles link check ✨"
 
 check_link "$ROOT/git/gitconfig" "$HOME/.gitconfig"
 check_link "$ROOT/git/ignore" "$HOME/.config/git/ignore"
