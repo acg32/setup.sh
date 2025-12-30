@@ -1,7 +1,7 @@
 [core]
     editor = nvim
     excludesfile = ~/.config/git/ignore
-	pager = sh -c 'command -v delta >/dev/null 2>&1 && exec delta || exec less -FRSX'
+    pager = delta
 [color "status"]
     added = yellow
     changed = green
@@ -27,9 +27,9 @@
 [format]
     pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
 [pager]
-	log = sh -c 'command -v delta >/dev/null 2>&1 && exec delta || exec less -FRSX'
-	diff = sh -c 'command -v delta >/dev/null 2>&1 && exec delta || exec less -FRSX'
-	show = sh -c 'command -v delta >/dev/null 2>&1 && exec delta || exec less -FRSX'
+    log = delta
+    diff = delta
+    show = delta
 [interactive]
     diffFilter = delta --color-only
 [delta]

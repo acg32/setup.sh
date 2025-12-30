@@ -27,7 +27,7 @@ def run(cmd: List[str], cwd: str) -> None:
 def ensure_git_pagers(console: Console) -> None:
     if shutil.which("git") is None:
         return
-    expected = "sh -c 'command -v delta >/dev/null 2>&1 && exec delta || exec less -FRSX'"
+    expected = "delta"
     keys = ["core.pager", "pager.log", "pager.diff", "pager.show"]
     updated = False
     for key in keys:
