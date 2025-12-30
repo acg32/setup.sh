@@ -1,6 +1,7 @@
 #!/usr/bin/env -S uv run --with rich --with questionary
 import argparse
 import os
+import shutil
 import subprocess
 from typing import List
 
@@ -21,6 +22,25 @@ PROFILES = {
 
 def run(cmd: List[str], cwd: str) -> None:
     subprocess.run(cmd, cwd=cwd, check=True)
+
+
+def ensure_git_pagers(console: Console) -> None:
+    if shutil.which("git") is None:
+        return
+    expected = "sh -c 'command -v delta >/dev/null 2>&1 && exec delta || exec less -FRSX'"
+    keys = ["core.pager", "pager.log", "pager.diff", "pager.show"]
+    updated = False
+    for key in keys:
+        result = subprocess.run(
+            ["git", "config", "--global", "--get", key],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0 or result.stdout.strip() != expected:
+            subprocess.run(["git", "config", "--global", key, expected], check=True)
+            updated = True
+    if updated:
+        console.print("[bold green]✓ Fixed Git pager config[/bold green]")
 
 
 def select_profile() -> str:
@@ -111,6 +131,7 @@ def main() -> None:
             console.print("[bold yellow]→ Running:[/bold yellow] make dotfiles")
             run(["make", "dotfiles"], cwd=root)
             console.print("[bold green]✓ Done:[/bold green] make dotfiles")
+            ensure_git_pagers(console)
     except subprocess.CalledProcessError as exc:
         console.print(
             Panel.fit(
