@@ -32,6 +32,8 @@ ansible-playbook --ask-become-pass -e user=$USER -i inventory.ini playbook-base.
 `config.yaml` provides role settings:
 - `battery.enable_dell` enables Dell-specific charge thresholds.
 - `battery.use_power_profiles_daemon` switches from TLP to GNOME power profiles.
+- `nvidia.enable` toggles the NVIDIA role in base playbook.
+- `nvidia.prime_profile` sets PRIME mode (intel|nvidia|on-demand).
 - `obsidian.update_vault` optionally updates the vault repo.
 
 Add or remove roles in `playbook-local.yaml` as needed.

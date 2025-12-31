@@ -7,6 +7,9 @@
   roles:
     - { role: preflight, tags: [preflight] }
     - { role: system-base, tags: [base] }
+    - role: nvidia
+      tags: [nvidia]
+      when: nvidia.enable | default(false) | bool
     - { role: vscode, tags: [vscode] }
     # - updates
     - { role: security, tags: [security] }

@@ -4,6 +4,11 @@
   ansible.builtin.apt:
     name:
       - "nvidia-driver-{{ nvidia.driver_version | default(550) }}"
+      - nvidia-prime
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Set PRIME profile
+  become: true
+  ansible.builtin.command: prime-select "{{ nvidia.prime_profile | default('on-demand') }}"

@@ -1,8 +1,10 @@
 system:
   arch: x86_64
 nvidia:
+  enable: true
   driver_version: 550
   dist_name: ubuntu2404
+  prime_profile: on-demand
 battery:
   enable_dell: false
   use_power_profiles_daemon: false
