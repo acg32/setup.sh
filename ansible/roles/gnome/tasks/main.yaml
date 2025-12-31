@@ -5,6 +5,27 @@
   register: dconf_file
   become: false
 
+- name: Enable Ubuntu universe repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
+    filename: ubuntu-universe
+    state: present
+
+- name: Enable Ubuntu universe updates repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-updates universe"
+    filename: ubuntu-universe
+    state: present
+
+- name: Enable Ubuntu universe security repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe"
+    filename: ubuntu-universe
+    state: present
+
 - name: Check dconf availability
   ansible.builtin.command: dconf --version
   register: dconf_version
@@ -44,4 +65,108 @@
   when:
     - gnome_profile_uuid is defined
     - dconf_version.rc == 0
+  become: false
+
+- name: Install GNOME themes and fonts (base)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - dconf-cli
+      - fonts-firacode
+      - papirus-icon-theme
+      - bibata-cursor-theme
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Check Blur my Shell package availability
+  ansible.builtin.command: apt-cache show gnome-shell-extension-blur-my-shell
+  register: blur_my_shell_check
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Install Blur my Shell extension
+  become: true
+  ansible.builtin.apt:
+    name: gnome-shell-extension-blur-my-shell
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  register: blur_my_shell_pkg
+  failed_when: false
+  when: blur_my_shell_check.rc == 0
+
+- name: Check Just Perfection package availability (primary)
+  ansible.builtin.command: apt-cache show gnome-shell-extension-just-perfection
+  register: just_perfection_check_primary
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Install Just Perfection extension (primary package name)
+  become: true
+  ansible.builtin.apt:
+    name: gnome-shell-extension-just-perfection
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  register: just_perfection_primary
+  failed_when: false
+  when: just_perfection_check_primary.rc == 0
+
+- name: Check Just Perfection package availability (fallback)
+  ansible.builtin.command: apt-cache show gnome-shell-extension-just-perfection-desktop
+  register: just_perfection_check_fallback
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Install Just Perfection extension (fallback package name)
+  become: true
+  ansible.builtin.apt:
+    name: gnome-shell-extension-just-perfection-desktop
+    state: present
+  when:
+    - just_perfection_check_fallback.rc == 0
+    - just_perfection_primary is failed
+
+- name: Check gnome-extensions availability
+  ansible.builtin.command: gnome-extensions --version
+  register: gnome_extensions_version
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Enable Just Perfection extension
+  ansible.builtin.command: gnome-extensions enable just-perfection-desktop@just-perfection
+  when:
+    - gnome_extensions_version.rc == 0
+    - just_perfection_primary is defined
+    - just_perfection_primary is not failed
+  failed_when: false
+  become: false
+
+- name: Enable Blur my Shell extension
+  ansible.builtin.command: gnome-extensions enable blur-my-shell@aunetx
+  when:
+    - gnome_extensions_version.rc == 0
+    - blur_my_shell_pkg is defined
+    - blur_my_shell_pkg is not failed
+  failed_when: false
+  become: false
+
+- name: Set icon theme
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface icon-theme 'Papirus'
+  when: ansible_env.DBUS_SESSION_BUS_ADDRESS is defined
+  become: false
+
+- name: Set cursor theme
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Ice'
+  when: ansible_env.DBUS_SESSION_BUS_ADDRESS is defined
+  become: false
+
+- name: Set cursor size
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface cursor-size 24
+  when: ansible_env.DBUS_SESSION_BUS_ADDRESS is defined
   become: false

@@ -21,10 +21,15 @@ $haskell\
 $python\
 [](fg:color_blue bg:color_bg3)\
 $docker_context\
-[](fg:color_bg3 bg:color_bg1)\
-$time\
-[ ](fg:color_bg1)\
+[ ](fg:color_bg3)\
 $line_break$character"""
+
+right_format = """
+[](color_bg1)\
+$cmd_duration\
+$battery\
+$time\
+[](color_bg1)"""
 
 palette = 'aci'
 
@@ -44,13 +49,13 @@ color_yellow = '#d79921'
 color_fg0 = '#dedede'
 color_bg1 = '#3c3836'
 color_bg3 = '#665c54'
-color_blue = '#0050cc'
-color_aqua = '#327f77'
-color_green = '#98971a'
-color_orange = '#cc0050'
-color_purple = '#8308ff'
-color_red = '#ff0883'
-color_yellow = '#c76700'
+color_blue = '#003a99'
+color_aqua = '#245a55'
+color_green = '#6b6a12'
+color_orange = '#a00040'
+color_purple = '#5a05b3'
+color_red = '#a03a6c'
+color_yellow = '#995000'
 
 [os]
 disabled = false
@@ -154,6 +159,22 @@ format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 symbol = ""
 style = "bg:color_bg3"
 format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+
+[cmd_duration]
+min_time = 2000
+style = "bg:color_bg1"
+format = '[[  $duration ](fg:color_fg0 bg:color_bg1)]($style)'
+
+[battery]
+full_symbol = "󰁹"
+charging_symbol = "󰂄"
+discharging_symbol = "󰂃"
+style = "bg:color_bg1"
+format = '[[ $symbol $percentage ](fg:color_fg0 bg:color_bg1)]($style)'
+
+[[battery.display]]
+threshold = 100
+style = "bg:color_bg1"
 
 [time]
 disabled = false
