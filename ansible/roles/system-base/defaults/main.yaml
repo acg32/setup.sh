@@ -1,0 +1,4 @@
+---
+zram_fraction: 0.25
+zram_max_size_gb: 24
+zram_compression_algorithm: lz4

@@ -19,6 +19,33 @@
     update_cache: true
     cache_valid_time: 3600
 
+- name: Install zram generator
+  become: true
+  ansible.builtin.apt:
+    name: systemd-zram-generator
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Configure zram generator
+  become: true
+  ansible.builtin.template:
+    src: zram-generator.conf.j2
+    dest: /etc/systemd/zram-generator.conf
+    mode: '0644'
+
+- name: Reload systemd for zram config
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Ensure zram service is running
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-zram-setup@zram0.service
+    enabled: true
+    state: started
+
 - name: Check Google Chrome apt source list
   become: true
   ansible.builtin.stat:
