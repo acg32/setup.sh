@@ -10,6 +10,8 @@
 - Added editorconfig and local override hooks.
 - Cleaned VS Code repo setup and pinned repo architectures to avoid apt i386 warnings.
 - Removed legacy TLP PPA on Noble and normalized Google Chrome repo arch to avoid apt warnings.
+- Added systemd zram generator setup (default 24G, lz4).
+- Switched Docker to socket-activated on-demand daemon.
 
 ## Commit styleguide
 

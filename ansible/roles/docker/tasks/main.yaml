@@ -51,15 +51,21 @@
     groups: docker
     append: true
 
-- name: Enable systemd docker.service
+- name: Enable systemd docker.socket for on-demand daemon
+  ansible.builtin.systemd_service:
+    name: docker.socket
+    enabled: true
+    state: started
+
+- name: Disable systemd docker.service for on-demand daemon
   ansible.builtin.systemd_service:
     name: docker.service
-    enabled: true
+    enabled: false
 
-- name: Enable systemd containerd.service
+- name: Disable systemd containerd.service for on-demand daemon
   ansible.builtin.systemd_service:
     name: containerd.service
-    enabled: true
+    enabled: false
 
 - name: Configure Docker daemon.json
   become: true
