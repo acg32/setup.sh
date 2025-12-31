@@ -12,6 +12,8 @@
 - Removed legacy TLP PPA on Noble and normalized Google Chrome repo arch to avoid apt warnings.
 - Added systemd zram generator setup (default 24G, lz4).
 - Switched Docker to socket-activated on-demand daemon.
+- Set NVIDIA PRIME to on-demand by default via nvidia role.
+- Enabled NVIDIA role in base playbook (opt-out via nvidia.enable).
 
 ## Commit styleguide
 
