@@ -50,8 +50,8 @@ hi Exception       guifg=#A6E22E               gui=bold
 hi Float           guifg=#AE81FF
 hi FoldColumn      guifg=#465457 guibg=#000000
 hi Folded          guifg=#465457 guibg=#000000
-hi Function        guifg=#A6E22E
-hi Identifier      guifg=#FD971F
+hi Function        guifg=#A6E22E               gui=bold
+hi Identifier      guifg=#D0D0D0
 hi Ignore          guifg=#808080 guibg=bg
 hi IncSearch       guifg=#C4BE89 guibg=#000000
 
@@ -60,16 +60,16 @@ hi Label           guifg=#E6DB74               gui=none
 hi Macro           guifg=#C4BE89               gui=italic
 hi SpecialKey      guifg=#66D9EF               gui=italic
 
-"hi MatchParen      guifg=#000000 guibg=#FD971F gui=bold
+hi MatchParen      guifg=#1B1D1E guibg=#FD971F gui=bold
 hi ModeMsg         guifg=#E6DB74
 hi MoreMsg         guifg=#E6DB74
 hi Operator        guifg=#F92672
 
 " complete menu
-hi Pmenu           guifg=#66D9EF guibg=#000000
-hi PmenuSel                      guibg=#808080
-hi PmenuSbar                     guibg=#080808
-hi PmenuThumb      guifg=#66D9EF
+hi Pmenu           guifg=#A6E22E guibg=#1B1D1E
+hi PmenuSel        guifg=#1B1D1E guibg=#A6E22E gui=bold
+hi PmenuSbar                     guibg=#0F1112
+hi PmenuThumb      guifg=#66D9EF guibg=#2A2D2E
 
 hi PreCondit       guifg=#A6E22E               gui=bold
 hi PreProc         guifg=#A6E22E
@@ -79,7 +79,7 @@ hi Search          guifg=#000000 guibg=#FFE792
 " marks
 hi SignColumn      guifg=#A6E22E guibg=#232526
 hi SpecialChar     guifg=#F92672               gui=bold
-hi SpecialComment  guifg=#7E8E91               gui=bold
+hi SpecialComment  guifg=#7E8E91               gui=bold,italic
 hi Special         guifg=#66D9EF guibg=bg      gui=italic
 if has("spell")
     hi SpellBad    guisp=#FF0000 gui=undercurl
@@ -88,8 +88,8 @@ if has("spell")
     hi SpellRare   guisp=#FFFFFF gui=undercurl
 endif
 hi Statement       guifg=#F92672               gui=bold
-hi StatusLine      guifg=#455354 guibg=fg
-hi StatusLineNC    guifg=#808080 guibg=#080808
+hi StatusLine      guifg=#F8F8F2 guibg=#3C3D37 gui=bold
+hi StatusLineNC    guifg=#808080 guibg=#1F1F1F
 hi StorageClass    guifg=#FD971F               gui=italic
 hi Structure       guifg=#66D9EF
 hi Tag             guifg=#F92672               gui=italic
@@ -100,18 +100,31 @@ hi Typedef         guifg=#66D9EF
 hi Type            guifg=#66D9EF               gui=none
 hi Underlined      guifg=#808080               gui=underline
 
-hi VertSplit       guifg=#808080 guibg=#080808 gui=bold
-hi VisualNOS                     guibg=#403D3D
-hi Visual                        guibg=#403D3D
+" Python extras (custom syntax groups from vimrc/nvim init)
+hi pythonConstant     guifg=#AE81FF            gui=bold
+hi pythonDecorator    guifg=#FD971F            gui=italic
+hi pythonClassName    guifg=#66D9EF            gui=bold
+hi pythonFunctionName guifg=#A6E22E
+hi pythonDunder       guifg=#F92672
+hi pythonSelf         guifg=#FD971F            gui=bold
+hi pythonTypeHint     guifg=#C4BE89
+hi pythonReturnHint   guifg=#BCA3A3
+hi pythonBuiltinType  guifg=#A6E22E            gui=bold
+hi pythonTodo         guifg=#FFFFFF guibg=#5F0000 gui=bold
+
+hi VertSplit       guifg=#3C3D37 guibg=#1F1F1F gui=bold
+hi VisualNOS                     guibg=#41444A
+hi Visual                        guibg=#41444A
 hi WarningMsg      guifg=#FFFFFF guibg=#333333 gui=bold
 hi WildMenu        guifg=#66D9EF guibg=#000000
 
 hi TabLineFill     guifg=#1B1D1E guibg=#1B1D1E
 hi TabLine         guibg=#1B1D1E guifg=#808080 gui=none
+hi TabLineSel      guifg=#F8F8F2 guibg=#3C3D37 gui=bold
 
 if s:molokai_original == 1
    hi Normal          guifg=#F8F8F2 guibg=#272822
-   hi Comment         guifg=#75715E
+   hi Comment         guifg=#75715E               gui=italic
    hi CursorLine                    guibg=#3E3D32
    hi CursorLineNr    guifg=#FD971F               gui=none
    hi CursorColumn                  guibg=#3E3D32
@@ -121,12 +134,12 @@ if s:molokai_original == 1
    hi SpecialKey      guifg=#75715E
 else
    hi Normal          guifg=#F8F8F2 guibg=#1B1D1E
-   hi Comment         guifg=#7E8E91
-   hi CursorLine                    guibg=#293739
-   hi CursorLineNr    guifg=#FD971F               gui=none
+   hi Comment         guifg=#7E8E91               gui=italic
+   hi CursorLine                    guibg=#2F3436
+   hi CursorLineNr    guifg=#FD971F               gui=bold
    hi CursorColumn                  guibg=#293739
    hi ColorColumn                   guibg=#232526
-   hi LineNr          guifg=#465457 guibg=#232526
+   hi LineNr          guifg=#4C5660 guibg=#232526
    hi NonText         guifg=#465457
    hi SpecialKey      guifg=#465457
 end
@@ -167,8 +180,8 @@ if &t_Co > 255
    hi Float           ctermfg=135
    hi FoldColumn      ctermfg=67  ctermbg=16
    hi Folded          ctermfg=67  ctermbg=16
-   hi Function        ctermfg=118
-   hi Identifier      ctermfg=208               cterm=none
+   hi Function        ctermfg=118               cterm=bold
+   hi Identifier      ctermfg=252               cterm=none
    hi Ignore          ctermfg=244 ctermbg=232
    hi IncSearch       ctermfg=193 ctermbg=16
 
@@ -177,16 +190,16 @@ if &t_Co > 255
    hi Macro           ctermfg=193
    hi SpecialKey      ctermfg=81
 
-   " hi MatchParen      ctermfg=7 ctermbg=235  cterm=bold
+   hi MatchParen      ctermfg=16 ctermbg=208 cterm=bold
    hi ModeMsg         ctermfg=229
    hi MoreMsg         ctermfg=229
    hi Operator        ctermfg=161
 
    " complete menu
-   hi Pmenu           ctermfg=81  ctermbg=16
-   hi PmenuSel        ctermfg=255 ctermbg=242
-   hi PmenuSbar                   ctermbg=232
-   hi PmenuThumb      ctermfg=81
+   hi Pmenu           ctermfg=118 ctermbg=234
+   hi PmenuSel        ctermfg=16  ctermbg=118 cterm=bold
+   hi PmenuSbar                   ctermbg=233
+   hi PmenuThumb      ctermfg=81  ctermbg=235
 
    hi PreCondit       ctermfg=118               cterm=bold
    hi PreProc         ctermfg=118
@@ -197,7 +210,7 @@ if &t_Co > 255
    " marks column
    hi SignColumn      ctermfg=118 ctermbg=235
    hi SpecialChar     ctermfg=161               cterm=bold
-   hi SpecialComment  ctermfg=245               cterm=bold
+   hi SpecialComment  ctermfg=245               cterm=bold,italic
    hi Special         ctermfg=82
    if has("spell")
        hi SpellBad                ctermbg=52
@@ -206,8 +219,8 @@ if &t_Co > 255
        hi SpellRare  ctermfg=none ctermbg=none  cterm=reverse
    endif
    hi Statement       ctermfg=161               cterm=bold
-   hi StatusLine      ctermfg=238 ctermbg=253
-   hi StatusLineNC    ctermfg=244 ctermbg=232
+   hi StatusLine      ctermfg=231 ctermbg=237 cterm=bold
+   hi StatusLineNC    ctermfg=244 ctermbg=234
    hi StorageClass    ctermfg=208
    hi Structure       ctermfg=81
    hi Tag             ctermfg=161
@@ -215,19 +228,31 @@ if &t_Co > 255
    hi Todo            ctermfg=231 ctermbg=232   cterm=bold
 
    hi Typedef         ctermfg=81
-   hi Type            ctermfg=81                cterm=none
+   hi Type            ctermfg=81                cterm=bold
    hi Underlined      ctermfg=244               cterm=underline
 
-   hi VertSplit       ctermfg=244 ctermbg=232   cterm=bold
+   " Python extras (custom syntax groups from vimrc/nvim init)
+   hi pythonConstant     ctermfg=141               cterm=bold
+   hi pythonDecorator    ctermfg=208               cterm=italic
+   hi pythonClassName    ctermfg=81                cterm=bold
+   hi pythonFunctionName ctermfg=118
+   hi pythonDunder       ctermfg=197
+   hi pythonSelf         ctermfg=208            cterm=bold
+   hi pythonTypeHint     ctermfg=193
+   hi pythonReturnHint   ctermfg=225
+   hi pythonBuiltinType  ctermfg=154               cterm=bold
+   hi pythonTodo         ctermfg=231 ctermbg=52    cterm=bold
+
+   hi VertSplit       ctermfg=237 ctermbg=234   cterm=bold
    hi VisualNOS                   ctermbg=238
-   hi Visual                      ctermbg=235
+   hi Visual                      ctermbg=237
    hi WarningMsg      ctermfg=231 ctermbg=238   cterm=bold
    hi WildMenu        ctermfg=81  ctermbg=16
 
-   hi Comment         ctermfg=59
+   hi Comment         ctermfg=59                cterm=italic
    hi CursorColumn                ctermbg=236
    hi ColorColumn                 ctermbg=236
-   hi LineNr          ctermfg=250 ctermbg=236
+   hi LineNr          ctermfg=244 ctermbg=236
    hi NonText         ctermfg=59
 
    hi SpecialKey      ctermfg=59
@@ -250,8 +275,8 @@ if &t_Co > 255
        hi Error           ctermfg=222 ctermbg=233
        hi Exception       ctermfg=154               cterm=bold
        hi Float           ctermfg=141
-       hi Function        ctermfg=154
-       hi Identifier      ctermfg=208
+       hi Function        ctermfg=154               cterm=bold
+       hi Identifier      ctermfg=252
 
        hi Keyword         ctermfg=197               cterm=bold
        hi Operator        ctermfg=197
@@ -264,7 +289,7 @@ if &t_Co > 255
        hi Title           ctermfg=203
        hi Visual                      ctermbg=238
 
-       hi Comment         ctermfg=244
+       hi Comment         ctermfg=244               cterm=italic
        hi LineNr          ctermfg=239 ctermbg=235
        hi NonText         ctermfg=239
        hi SpecialKey      ctermfg=239

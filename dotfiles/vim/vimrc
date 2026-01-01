@@ -1,84 +1,58 @@
 " -------------------------------- "
 "         General
 " -------------------------------- "
-" set UTF-8 encoding
-set enc=utf-8
-set fenc=utf-8
-set termencoding=utf-8
-" disable vi compatibility (emulation of old bugs)
 set nocompatible
-" Remove useless spaces at the end of the line
-autocmd BufWritePre * %s/\s\+$//e
-" Vertical bar at 100 characters
-set colorcolumn=100
-" turn line numbers on
+set encoding=utf-8
+set fileencoding=utf-8
+set backspace=indent,eol,start
+set hidden
 set number
-" highlight matching braces
 set showmatch
-" Highlight current line
 set cursorline
-" intelligent comments
-set comments=sl:/*,mb:\ *,elx:\ */
-" Highlight search pattern where found
-set hlsearch
-" Start searching on the first key stroke
-set incsearch
-" Case sensitive only when capital letters in search
-set ignorecase
-set smartcase
-" Show matches on TAB completion
-set wildmenu
-" Set new split position
+set colorcolumn=100
 set splitright
 set splitbelow
+set wildmenu
+set wildmode=list:longest
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+set scrolloff=5
+set updatetime=300
 
-" -------------------------------- "
-"         Hotkeys
-" -------------------------------- "
-"" Disable arrow keys
-noremap <Up> <nop>
-noremap <Down> <nop>
-noremap <Left> <nop>
-noremap <Right> <nop>
-"" Use jk to escape (as it is closer)
-inoremap jk <Esc>
-" Binding for lnext and lprev to jump to errors
-map <F3> :lprev <CR>
-map <F4> :lnext <CR>
+" Strip trailing whitespace on save
+augroup trim_trailing_ws
+  autocmd!
+  autocmd BufWritePre * %s/\s\+$//e
+augroup END
 
 " -------------------------------- "
 "         Indentation
 " -------------------------------- "
-" use indentation of previous line
 set autoindent
-" use intelligent indentation for C
 set smartindent
-" configure tabwidth and insert spaces instead of tabs
-set tabstop=4 " tab width is 4 spaces
-set expandtab " expand tabs to spaces
+set tabstop=4
+set shiftwidth=4
 set softtabstop=4
-set shiftwidth=4 " indent also with 4 spaces
-filetype indent on
-" Fold code based on indent
+set expandtab
 set foldmethod=indent
-" Change indentation for for some specific filetypes
+
+filetype plugin indent on
+
 autocmd FileType html setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType json setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType sql setlocal shiftwidth=2 tabstop=2 softtabstop=2
 
 " -------------------------------- "
-"         Syntax definition
+"         Filetype tweaks
 " -------------------------------- "
-" PostgreSQL syntax by default
 let g:sql_type_default = 'pgsql'
 autocmd FileType sql setlocal commentstring=--\ %s
-" HTML filetpye detection with ext (remove problems with templates)
 au BufReadPost *.html set filetype=html
-" Override s3cfg filetype
 au! BufNewFile,BufRead *.s3cfg setf dosini
 au! BufNewFile,BufRead env.dist* setf sh
-" .<ext>.template should be read as <ext> files
 au BufRead,BufNewFile *.ini.template set filetype=dosini
 au BufRead,BufNewFile *.yml.template set filetype=yaml
 au BufRead,BufNewFile *.aws/credentials set filetype=dosini
@@ -89,53 +63,62 @@ au BufRead,BufNewFile .ghci set filetype=haskell
 " -------------------------------- "
 "         Colors
 " -------------------------------- "
-" Enable italics
-set t_ZH=[3m
-set t_ZR=[23m
-" turn syntax highlighting on
-set t_Co=256
+if &t_Co < 256
+  set t_Co=256
+endif
+
 syntax on
-colorscheme molokai
+
+if filereadable(expand("~/.vim/colors/molokai.vim"))
+  colorscheme molokai
+else
+  colorscheme default
+endif
+
 highlight Comment cterm=italic
 
-" -------------------------------- "
-"         Misc
-" -------------------------------- "
-" vimdiff params
-set diffopt=vertical,filler
+" Python self highlight (Vim only).
+if !has('nvim')
+  " Define and re-apply the match after syntax/colorscheme resets.
+  function! s:python_self_apply() abort
+    if &filetype !=# 'python'
+      return
+    endif
+    syntax keyword pythonSelf self
+    highlight pythonSelf cterm=bold ctermfg=208 gui=bold guifg=#FD971F
+  endfunction
+
+  augroup python_self_highlight
+    autocmd!
+    " Catch first buffer and later Python buffers.
+    autocmd VimEnter * call <SID>python_self_apply()
+    autocmd BufWinEnter *.py call <SID>python_self_apply()
+    " Restore match after syntax/colorscheme reloads.
+    autocmd Syntax python call <SID>python_self_apply()
+    autocmd ColorScheme * call <SID>python_self_apply()
+  augroup END
+endif
+
+" Python self highlight (Vim only; keep minimal and explicit).
 
 " -------------------------------- "
-"         Status bar
+"         Status line
 " -------------------------------- "
-set laststatus=2  " Always display the status line
+set laststatus=2
+hi StatusLineMode   ctermfg=231 ctermbg=24  cterm=bold
+hi StatusLineFile   ctermfg=231 ctermbg=236 cterm=none
+hi StatusLineInfo   ctermfg=250 ctermbg=234 cterm=none
+hi StatusLinePos    ctermfg=231 ctermbg=238 cterm=bold
+hi StatusLineSep    ctermfg=240 ctermbg=234 cterm=none
 
-hi StatusLineTime      ctermfg=75  ctermbg=236 cterm=bold
-hi StatusLineStatus    ctermfg=172 ctermbg=236 cterm=bold
-hi StatusLineFile      ctermfg=76 ctermbg=236 cterm=bold
-hi StatusLineFormat    ctermfg=135 ctermbg=236 cterm=bold
-hi StatusLineCoords    ctermfg=144 ctermbg=236 cterm=bold
-hi StatusLineSplitter  ctermfg=254 ctermbg=236 cterm=bold
-
-" Configure the status line
-let g:lsplitter="\ \▶\ "
-
-set statusline=%#StatusLineTime#
-set statusline+=%{strftime('%a\ %d\ %b\ %Y,\ %H:%M\ %Z\ ')}
-set statusline+=%#StatusLineSplitter#%{g:lsplitter}
-set statusline+=%#StatusLineStatus#
-set statusline+=Status:%h%m%r  " Help file, modified, readonly flags
-set statusline+=\ Mode:[%{mode()}]
-set statusline+=%#StatusLineSplitter#%{g:lsplitter}
-set statusline+=%#StatusLineFile#
-set statusline+=%y  " File type
-set statusline+=\ %F  " Full path of the file
-set statusline+=%=  " Switch to the right side
-set statusline+=%#StatusLineFormat#
-set statusline+=\ Format:[%{&fileformat}]  " File format (unix/dos/mac)
-set statusline+=\ Encoding:[%{&fileencoding?&fileencoding:'none'}]  " File encoding
-set statusline+=%#StatusLineSplitter#%{g:lsplitter}
-set statusline+=%#StatusLineCoords#
-set statusline+=x:%3c,\ y:%3l/%L\ (%3p%%)  " Column number, line number/total lines
+set statusline=
+set statusline+=%#StatusLineMode#\ %{mode()}\ 
+set statusline+=%#StatusLineSep#\|\ 
+set statusline+=%#StatusLineFile#%f\ %m%r%h%w\ 
+set statusline+=%#StatusLineSep#\|\ 
+set statusline+=%#StatusLineInfo#[%{&filetype}]\ [%{&fileencoding?&fileencoding:'none'}]\ 
+set statusline+=%=
+set statusline+=%#StatusLinePos#%l:%c\ %p%%\ 
 
 " -------------------------------- "
 "         Local overrides

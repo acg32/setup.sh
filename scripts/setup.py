@@ -11,6 +11,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 
+# Available ansible profiles
 PROFILES = {
     "base": ["ansible-base"],
     "ux": ["ansible-ux"],
