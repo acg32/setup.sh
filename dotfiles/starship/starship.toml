@@ -169,7 +169,6 @@ format = '[[  $duration ](fg:color_fg0 bg:color_bg1)]($style)'
 full_symbol = "󰁹"
 charging_symbol = "󰂄"
 discharging_symbol = "󰂃"
-style = "bg:color_bg1"
 format = '[[ $symbol $percentage ](fg:color_fg0 bg:color_bg1)]($style)'
 
 [[battery.display]]
