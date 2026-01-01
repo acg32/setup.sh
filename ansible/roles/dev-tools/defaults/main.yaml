@@ -1,0 +1,5 @@
+---
+neovim_release_url: "https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz"
+neovim_archive_path: "/tmp/nvim-linux-x86_64.tar.gz"
+neovim_install_dir: "/opt/nvim-linux-x86_64"
+neovim_system_link: "/usr/local/bin/nvim"

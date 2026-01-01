@@ -30,5 +30,5 @@ make uninstall
 - Tool defaults are linked under `~/.config/` for `rg`, `fd`, `bat`, and `less`.
 - Optional per-machine overrides:
   - `~/.vimrc.local`
-  - `~/.config/nvim/init.local.vim`
+  - `~/.config/nvim/init.local.lua`
   - `~/.zshrc.local`

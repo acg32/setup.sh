@@ -1,4 +1,85 @@
 ---
+- name: Capture user home for local installs
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ user }}"
+
+- name: Set Neovim user home fact
+  ansible.builtin.set_fact:
+    nvim_user_home: "{{ ansible_facts.getent_passwd[user][4] }}"
+
+- name: Remove distro Neovim package
+  become: true
+  ansible.builtin.apt:
+    name: neovim
+    state: absent
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Remove Neovim PPA if present
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/ppa_neovim_ppa_stable_noble.list
+    state: absent
+
+- name: Download Neovim stable release
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ neovim_release_url }}"
+    dest: "{{ neovim_archive_path }}"
+    mode: "0644"
+
+- name: Remove old Neovim install
+  become: true
+  ansible.builtin.file:
+    path: "{{ neovim_install_dir }}"
+    state: absent
+
+- name: Extract Neovim to /opt
+  become: true
+  ansible.builtin.unarchive:
+    src: "{{ neovim_archive_path }}"
+    dest: /opt
+    remote_src: true
+
+- name: Link Neovim into /usr/local/bin
+  become: true
+  ansible.builtin.file:
+    src: "{{ neovim_install_dir }}/bin/nvim"
+    dest: "{{ neovim_system_link }}"
+    state: link
+
+- name: Ensure user local bin directory exists
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.file:
+    path: "{{ nvim_user_home }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Remove legacy user Neovim symlink
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.file:
+    path: "{{ nvim_user_home }}/.local/bin/nvim"
+    state: absent
+
+- name: Remove legacy user Neovim install
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.file:
+    path: "{{ nvim_user_home }}/.local/share/nvim-linux64"
+    state: absent
+
+- name: Link Neovim into user local bin
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.file:
+    src: "{{ neovim_install_dir }}/bin/nvim"
+    dest: "{{ nvim_user_home }}/.local/bin/nvim"
+    state: link
+    force: true
+
 - name: Install optional CLI tools
   become: true
   ansible.builtin.apt:

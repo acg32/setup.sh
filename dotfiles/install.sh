@@ -38,7 +38,8 @@ install_common() {
 
 install_full() {
     link_file "$ROOT/tmux/tmux.conf" "$HOME/.tmux.conf"
-    link_file "$ROOT/nvim/init.vim" "$CONFIG_HOME/nvim/init.vim"
+    link_file "$ROOT/nvim/init.lua" "$CONFIG_HOME/nvim/init.lua"
+    link_file "$ROOT/nvim/lua" "$CONFIG_HOME/nvim/lua"
     link_file "$ROOT/starship/starship.toml" "$CONFIG_HOME/starship.toml"
     link_file "$ROOT/aliases" "$CONFIG_HOME/aliases"
     link_file "$ROOT/btop/btop.conf" "$CONFIG_HOME/btop/btop.conf"
