@@ -48,6 +48,11 @@ install_full() {
     link_file "$ROOT/rg/rg.conf" "$CONFIG_HOME/rg/rg.conf"
     link_file "$ROOT/fd/ignore" "$CONFIG_HOME/fd/ignore"
     link_file "$ROOT/less/lesskey" "$CONFIG_HOME/less/lesskey"
+    link_file "$ROOT/less/lesskey" "$HOME/.lesskey"
+
+    if command -v lesskey >/dev/null 2>&1; then
+        lesskey
+    fi
 }
 
 case "$MODE" in

@@ -1,7 +1,7 @@
 [core]
     editor = nvim
     excludesfile = ~/.config/git/ignore
-    pager = delta
+    pager = less
 [color "status"]
     added = yellow
     changed = green
@@ -26,16 +26,6 @@
     autoStash = true
 [format]
     pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
-[pager]
-    log = delta
-    diff = delta
-    show = delta
-[interactive]
-    diffFilter = delta --color-only
-[delta]
-    navigate = true
-    light = false
-    syntax-theme = Monokai Extended
 [merge]
     conflictstyle = diff3
 [diff]
