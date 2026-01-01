@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "git-st: git not found" >&2
+  exit 1
+fi
+
+color() {
+  local code="$1"
+  shift
+  printf "\033[%sm%s\033[0m" "$code" "$*"
+}
+
+print_header() {
+  local branch_line="$1"
+  local meta="$2"
+  printf "%b\n" "$(color "90" "────────────────────────────────────────")"
+  printf "%b %s\n" "$(color "35" "")" "$branch_line"
+  if [[ -n "$meta" ]]; then
+    printf "%b %s\n" "$(color "90" "↳")" "$meta"
+  fi
+  printf "%b\n" "$(color "90" "────────────────────────────────────────")"
+}
+
+format_status_line() {
+  local status="$1"
+  local path="$2"
+  local icon="•"
+  local color_code="0"
+
+  case "$status" in
+    "??") icon=""; color_code="34" ;;
+    *U*)   icon=""; color_code="35" ;;
+    A*|*A) icon=""; color_code="32" ;;
+    D*|*D) icon=""; color_code="31" ;;
+    R*|*R) icon="»"; color_code="36" ;;
+    M*|*M) icon=""; color_code="33" ;;
+  esac
+
+  printf "%b %s\n" "$(color "$color_code" "$icon")" "$path"
+}
+
+branch_line=""
+meta_line=""
+count_added=0
+count_modified=0
+count_deleted=0
+count_renamed=0
+count_untracked=0
+count_conflicted=0
+count_other=0
+
+while IFS= read -r line; do
+  if [[ "$line" == "## "* ]]; then
+    branch_line="${line#"## "}"
+    meta_line=""
+    if [[ "$branch_line" == *"["* ]]; then
+      meta_line="${branch_line#* }"
+    fi
+    print_header "$branch_line" "$meta_line"
+    continue
+  fi
+
+  status="${line:0:2}"
+  path="${line:3}"
+
+  case "$status" in
+    "??") count_untracked=$((count_untracked + 1)) ;;
+    *U*)   count_conflicted=$((count_conflicted + 1)) ;;
+    A*|*A) count_added=$((count_added + 1)) ;;
+    D*|*D) count_deleted=$((count_deleted + 1)) ;;
+    R*|*R) count_renamed=$((count_renamed + 1)) ;;
+    M*|*M) count_modified=$((count_modified + 1)) ;;
+    *)     count_other=$((count_other + 1)) ;;
+  esac
+
+  format_status_line "$status" "$path"
+done < <(git status --porcelain=v1 -b --show-stash)
+
+summary_parts=()
+if (( count_added > 0 )); then summary_parts+=("$(color "32" " $count_added")"); fi
+if (( count_modified > 0 )); then summary_parts+=("$(color "33" " $count_modified")"); fi
+if (( count_deleted > 0 )); then summary_parts+=("$(color "31" " $count_deleted")"); fi
+if (( count_renamed > 0 )); then summary_parts+=("$(color "36" "» $count_renamed")"); fi
+if (( count_untracked > 0 )); then summary_parts+=("$(color "34" " $count_untracked")"); fi
+if (( count_conflicted > 0 )); then summary_parts+=("$(color "35" " $count_conflicted")"); fi
+if (( count_other > 0 )); then summary_parts+=("$(color "90" "• $count_other")"); fi
+
+if (( ${#summary_parts[@]} > 0 )); then
+  printf "%b\n" "$(color "90" "────────────────────────────────────────")"
+  printf "%b %s\n" "$(color "90" "Σ")" "${summary_parts[*]}"
+  printf "%b\n" "$(color "90" "────────────────────────────────────────")"
+fi

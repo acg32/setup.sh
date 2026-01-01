@@ -25,6 +25,7 @@ color "1;36" "✨ Dotfiles link check ✨"
 
 check_link "$ROOT/git/gitconfig" "$HOME/.gitconfig"
 check_link "$ROOT/git/ignore" "$HOME/.config/git/ignore"
+check_link "$ROOT/bin" "$HOME/.local/bin"
 check_link "$ROOT/zsh/zshrc" "$HOME/.zshrc"
 check_link "$ROOT/vim/vimrc" "$HOME/.vimrc"
 check_link "$ROOT/vim/colors" "$HOME/.vim/colors"

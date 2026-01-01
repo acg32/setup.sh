@@ -27,6 +27,7 @@ restore_backup() {
 
 remove_link "$HOME/.gitconfig"
 remove_link "$HOME/.config/git/ignore"
+remove_link "$HOME/.local/bin"
 remove_link "$HOME/.zshrc"
 remove_link "$HOME/.vimrc"
 remove_link "$HOME/.vim/colors"

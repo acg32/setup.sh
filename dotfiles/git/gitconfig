@@ -50,6 +50,6 @@
     fap = fetch --all --prune
     graph = log --graph --oneline --decorate=short --branches='*'
     sh = show --color-words='[^[]]'
-    st = status -sb
+    st = "!git-st"
 [include]
     path = ~/.gitconfig.local
