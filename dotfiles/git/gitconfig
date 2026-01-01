@@ -49,6 +49,9 @@
     df = diff --color-words='[^[:space:]]'
     fap = fetch --all --prune
     graph = log --graph --oneline --decorate=short --branches='*'
+    g = "!git-graph"
+    l = "!git-fancy-log"
+    logall = "!git-logall"
     sh = show --color-words='[^[]]'
     st = "!git-st"
 [include]

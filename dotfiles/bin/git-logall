@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "git-logall: git not found" >&2
+  exit 1
+fi
+
+if command -v bat >/dev/null 2>&1; then
+  pager=(bat --plain --paging=always --color=always)
+elif command -v batcat >/dev/null 2>&1; then
+  pager=(batcat --plain --paging=always --color=always)
+else
+  echo "git-logall: bat not found" >&2
+  exit 1
+fi
+
+format='%C(blue)%h%Creset %C(242)•%Creset %C(208) %cr%Creset %C(green)%s%Creset %C(244)by %an%Creset %C(yellow)%d%Creset'
+
+{
+  printf "\033[90m────────────────────────────────────────\033[0m\n"
+  printf "\033[35m\033[0m Full history\n"
+  printf "\033[90m────────────────────────────────────────\033[0m\n"
+  git log --graph --decorate=short --abbrev-commit --date=relative --color=always \
+    --pretty=format:"$format" "$@"
+  printf "\033[90m────────────────────────────────────────\033[0m\n"
+} | "${pager[@]}"

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "git-log: git not found" >&2
+  exit 1
+fi
+
+color() {
+  local code="$1"
+  shift
+  printf "\033[%sm%s\033[0m" "$code" "$*"
+}
+
+print_banner() {
+  local branch
+  branch=$(command git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "detached")
+  printf "%b\n" "$(color "90" "────────────────────────────────────────")"
+  printf "%b %s\n" "$(color "35" "")" "Log for ${branch}"
+  printf "%b\n" "$(color "90" "────────────────────────────────────────")"
+}
+
+has_max_count=false
+for arg in "$@"; do
+  if [[ "$arg" == "-n" || "$arg" == --max-count* ]]; then
+    has_max_count=true
+    break
+  fi
+  if [[ "$arg" == --max-count ]]; then
+    has_max_count=true
+    break
+  fi
+  if [[ "$arg" == -n* ]]; then
+    has_max_count=true
+    break
+  fi
+  if [[ "$arg" == --since* || "$arg" == --until* ]]; then
+    has_max_count=true
+  fi
+done
+
+log_args=()
+if [[ "$has_max_count" == false ]]; then
+  log_args+=("--max-count=20")
+fi
+
+format='%C(blue)%h%Creset %C(242)•%Creset %C(208) %cr%Creset %C(green)%s%Creset %C(244)by %an%Creset %C(yellow)%d%Creset'
+
+print_banner
+command git log --graph --decorate=short --abbrev-commit --date=relative --color=always \
+  --pretty=format:"$format" \
+  "${log_args[@]}" "$@"
+printf "%b\n" "$(color "90" "────────────────────────────────────────")"
