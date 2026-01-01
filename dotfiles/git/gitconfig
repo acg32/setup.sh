@@ -26,6 +26,8 @@
     autoStash = true
 [format]
     pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
+[pager]
+    diff = delta
 [merge]
     conflictstyle = diff3
 [diff]
