@@ -3,6 +3,7 @@
 - `LAPTOP_SETUP_CONTEXT.md`: architecture, constraints, and current state.
 - `docker.md`: container usage conventions for this laptop.
 - `CHANGELOG.md`: major setup changes.
+- `system-report.md`: how to collect a system snapshot for debugging (`make report`).
 - `../scripts/setup.py`: interactive setup runner.
 
 ## Commit styleguide

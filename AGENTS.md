@@ -3,6 +3,8 @@
 ## General
 - Before applying any changes, read all `docs/*.md`, then read the relevant code.
 - Exception: skip full doc pass for trivial, non-code questions.
+- When you need to check or diagnose the local system, run `make report`
+  (or `scripts/system_report.sh`) and use its output as the baseline.
 - Commit styleguide:
   - Use a playful, fanciful tone and keep it short.
   - Include emojis in the subject line.
