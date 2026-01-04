@@ -23,6 +23,8 @@ map("n", "<leader>fh", function()
   require("telescope.builtin").help_tags()
 end, { desc = "Help tags" })
 
+map("n", "<leader>nt", "<cmd>Neotree toggle<cr>", { desc = "File tree" })
+
 map("n", "<leader>e", vim.diagnostic.open_float, { desc = "Diagnostics" })
 map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
 map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })

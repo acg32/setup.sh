@@ -4,6 +4,7 @@ vim.g.maplocalleader = " "
 require("config.options")
 require("config.keymaps")
 require("config.autocmds")
+require("config.homepage")
 require("config.lazy")
 
 local local_init = vim.fn.stdpath("config") .. "/init.local.lua"

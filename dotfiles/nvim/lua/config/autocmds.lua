@@ -34,3 +34,22 @@ autocmd("FileType", {
     vim.opt_local.commentstring = "-- %s"
   end,
 })
+
+local tree_group = augroup("NeoTreeOnDir", { clear = true })
+autocmd("VimEnter", {
+  group = tree_group,
+  callback = function()
+    if vim.fn.argc() ~= 1 then
+      return
+    end
+    local dir = vim.fn.argv(0)
+    if vim.fn.isdirectory(dir) ~= 1 then
+      return
+    end
+    vim.cmd("cd " .. vim.fn.fnameescape(dir))
+    local ok, neotree = pcall(require, "neo-tree.command")
+    if ok then
+      neotree.execute({ action = "focus", source = "filesystem", position = "left" })
+    end
+  end,
+})

@@ -103,6 +103,68 @@ return {
     end,
   },
   {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    cmd = "Neotree",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      local neotree = safe_require("neo-tree")
+      if not neotree then
+        return
+      end
+      neotree.setup({
+        close_if_last_window = true,
+        enable_git_status = true,
+        enable_diagnostics = true,
+        default_component_configs = {
+          indent = {
+            with_markers = true,
+          },
+          git_status = {
+            symbols = {
+              added = "✚",
+              modified = "",
+              deleted = "✖",
+              renamed = "󰁕",
+              untracked = "",
+              ignored = "",
+              unstaged = "",
+              staged = "✓",
+              conflict = "",
+            },
+          },
+        },
+        filesystem = {
+          follow_current_file = { enabled = true },
+          use_libuv_file_watcher = true,
+          hijack_netrw_behavior = "open_current",
+          filtered_items = {
+            hide_dotfiles = false,
+            hide_gitignored = false,
+            never_show = { ".git" },
+            hide_by_name = {
+              ".DS_Store",
+              ".cache",
+              ".venv",
+              "node_modules",
+              "dist",
+              "build",
+              "target",
+            },
+          },
+        },
+        window = {
+          position = "left",
+          width = 32,
+        },
+      })
+    end,
+  },
+  {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPost", "BufNewFile" },
     build = ":TSUpdate",

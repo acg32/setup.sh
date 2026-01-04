@@ -19,6 +19,15 @@ fi
 
 # Node (optional, lazy-loaded)
 export NVM_DIR="$HOME/.nvm"
+if [[ -f "$NVM_DIR/alias/default" ]]; then
+    nvm_default="$(<"$NVM_DIR/alias/default")"
+    if [[ -n "$nvm_default" && -f "$NVM_DIR/alias/$nvm_default" ]]; then
+        nvm_default="$(<"$NVM_DIR/alias/$nvm_default")"
+    fi
+    if [[ -n "$nvm_default" && -d "$NVM_DIR/versions/node/$nvm_default/bin" ]]; then
+        path=("$NVM_DIR/versions/node/$nvm_default/bin" $path)
+    fi
+fi
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
     _nvm_load() {
         # shellcheck disable=SC1090
