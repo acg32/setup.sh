@@ -9,20 +9,20 @@
 
 - name: Allow SSH (port 22)
   become: true
-  ansible.builtin.ufw:
+  community.general.ufw:
     rule: allow
     port: "22"
     proto: tcp
 
 - name: Enable UFW with default deny
   become: true
-  ansible.builtin.ufw:
+  community.general.ufw:
     state: enabled
     policy: deny
 
 - name: Allow outgoing traffic
   become: true
-  ansible.builtin.ufw:
+  community.general.ufw:
     direction: outgoing
     policy: allow
 

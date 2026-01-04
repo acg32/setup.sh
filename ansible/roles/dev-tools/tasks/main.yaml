@@ -80,6 +80,47 @@
     state: link
     force: true
 
+- name: Ensure apt keyrings directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Fetch NodeSource signing key
+  become: true
+  ansible.builtin.get_url:
+    url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
+    dest: /tmp/nodesource.gpg.key
+    mode: "0644"
+
+- name: Ensure gpg is available for keyring install
+  become: true
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install NodeSource signing keyring
+  become: true
+  ansible.builtin.command: gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg /tmp/nodesource.gpg.key
+  args:
+    creates: /etc/apt/keyrings/nodesource.gpg
+
+- name: Remove temporary NodeSource key
+  become: true
+  ansible.builtin.file:
+    path: /tmp/nodesource.gpg.key
+    state: absent
+
+- name: Add NodeSource repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ nodesource_major }}.x nodistro main"
+    filename: nodesource
+    state: present
+
 - name: Install optional CLI tools
   become: true
   ansible.builtin.apt:
@@ -93,6 +134,35 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Install Node.js from NodeSource
+  become: true
+  ansible.builtin.apt:
+    name:
+      - nodejs
+      - npm
+    state: latest
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Read Node.js version
+  ansible.builtin.command: node --version
+  register: node_version
+  changed_when: false
+
+- name: Parse Node.js version
+  ansible.builtin.set_fact:
+    node_version_clean: "{{ node_version.stdout | regex_replace('^v', '') }}"
+    node_major: "{{ node_version.stdout | regex_replace('^v', '') | split('.') | first | int }}"
+    node_minor: "{{ (node_version.stdout | regex_replace('^v', '') | split('.'))[1] | int }}"
+
+- name: Update npm to latest
+  become: true
+  ansible.builtin.command: npm install -g npm@latest
+  when: >-
+    (node_major == 20 and node_minor >= 17) or
+    (node_major > 22) or
+    (node_major == 22 and node_minor >= 9)
 
 - name: Resolve delta architecture
   ansible.builtin.set_fact:
