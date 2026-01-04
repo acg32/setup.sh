@@ -195,6 +195,32 @@ return {
     end,
   },
   {
+    "lukas-reineke/indent-blankline.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      local ibl = safe_require("ibl")
+      if not ibl then
+        return
+      end
+
+      vim.api.nvim_set_hl(0, "IndentGuideA", { fg = "#3b4252" })
+      vim.api.nvim_set_hl(0, "IndentGuideB", { fg = "#434c5e" })
+      vim.api.nvim_set_hl(0, "IndentGuideC", { fg = "#4c566a" })
+
+      ibl.setup({
+        indent = {
+          char = "|",
+          highlight = { "IndentGuideA", "IndentGuideB", "IndentGuideC" },
+        },
+        scope = { enabled = false },
+        exclude = {
+          filetypes = { "homepage" },
+          buftypes = { "terminal", "nofile", "quickfix", "prompt" },
+        },
+      })
+    end,
+  },
+  {
     "williamboman/mason.nvim",
     cmd = "Mason",
     config = function()
@@ -232,9 +258,8 @@ return {
       "williamboman/mason-lspconfig.nvim",
     },
     config = function()
-      local lspconfig = safe_require("lspconfig")
       local cmp_lsp = safe_require("cmp_nvim_lsp")
-      if not lspconfig or not cmp_lsp then
+      if not cmp_lsp then
         return
       end
       local capabilities = cmp_lsp.default_capabilities()
@@ -256,21 +281,25 @@ return {
         float = { border = "rounded" },
       })
 
-      lspconfig.lua_ls.setup({
+      local base_config = {
         capabilities = capabilities,
         on_attach = on_attach,
+      }
+
+      vim.lsp.config("lua_ls", vim.tbl_deep_extend("force", base_config, {
         settings = {
           Lua = {
             diagnostics = { globals = { "vim" } },
           },
         },
-      })
+      }))
 
       for _, server in ipairs({ "bashls", "jsonls", "pyright", "yamlls" }) do
-        lspconfig[server].setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-        })
+        vim.lsp.config(server, base_config)
+      end
+
+      for _, server in ipairs({ "lua_ls", "bashls", "jsonls", "pyright", "yamlls" }) do
+        vim.lsp.enable(server)
       end
     end,
   },

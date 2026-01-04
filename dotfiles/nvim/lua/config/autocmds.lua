@@ -35,6 +35,21 @@ autocmd("FileType", {
   end,
 })
 
+local number_group = augroup("EnableLineNumbers", { clear = true })
+autocmd({ "BufEnter", "BufWinEnter" }, {
+  group = number_group,
+  callback = function()
+    if vim.bo.buftype ~= "" then
+      return
+    end
+    if vim.bo.filetype == "homepage" then
+      return
+    end
+    vim.wo.number = true
+    vim.wo.relativenumber = false
+  end,
+})
+
 local tree_group = augroup("NeoTreeOnDir", { clear = true })
 autocmd("VimEnter", {
   group = tree_group,
