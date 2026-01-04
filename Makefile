@@ -1,4 +1,5 @@
 SHELL := /bin/sh
+PATH := $(HOME)/.local/bin:$(PATH)
 
 .PHONY: bootstrap ansible-base ansible-ux ansible-workloads ansible-personal dotfiles verify setup install report
 

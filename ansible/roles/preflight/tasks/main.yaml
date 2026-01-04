@@ -16,9 +16,10 @@
       - Portable
       - Detachable
       - Convertible
+    chassis_raw: "{{ ansible_facts.get('chassis_type', []) }}"
     chassis_list: >-
       {{
-        [ansible_facts.chassis_type] if ansible_facts.chassis_type is string
-        else (ansible_facts.chassis_type | default([]))
+        [chassis_raw] if chassis_raw is string
+        else chassis_raw
       }}
   when: (chassis_list | intersect(laptop_types) | length) == 0

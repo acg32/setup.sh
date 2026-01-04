@@ -89,8 +89,16 @@
       - fd-find
       - bat
       - eza
-      - git-delta
       - jq
     state: present
     update_cache: true
     cache_valid_time: 3600
+
+- name: Resolve delta architecture
+  ansible.builtin.set_fact:
+    delta_arch: "{{ delta_arch_map[ansible_architecture] | default('amd64') }}"
+
+- name: Install delta from GitHub release
+  become: true
+  ansible.builtin.apt:
+    deb: "https://github.com/dandavison/delta/releases/download/{{ delta_version }}/git-delta_{{ delta_version }}_{{ delta_arch }}.deb"

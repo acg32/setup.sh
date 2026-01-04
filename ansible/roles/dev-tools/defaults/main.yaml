@@ -3,3 +3,7 @@ neovim_release_url: "https://github.com/neovim/neovim/releases/download/stable/n
 neovim_archive_path: "/tmp/nvim-linux-x86_64.tar.gz"
 neovim_install_dir: "/opt/nvim-linux-x86_64"
 neovim_system_link: "/usr/local/bin/nvim"
+delta_version: "0.18.2"
+delta_arch_map:
+  x86_64: amd64
+  aarch64: arm64

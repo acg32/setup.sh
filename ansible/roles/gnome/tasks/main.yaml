@@ -8,21 +8,21 @@
 - name: Enable Ubuntu universe repository
   become: true
   ansible.builtin.apt_repository:
-    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_facts['distribution_release'] }} universe"
     filename: ubuntu-universe
     state: present
 
 - name: Enable Ubuntu universe updates repository
   become: true
   ansible.builtin.apt_repository:
-    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-updates universe"
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_facts['distribution_release'] }}-updates universe"
     filename: ubuntu-universe
     state: present
 
 - name: Enable Ubuntu universe security repository
   become: true
   ansible.builtin.apt_repository:
-    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe"
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_facts['distribution_release'] }}-security universe"
     filename: ubuntu-universe
     state: present
 

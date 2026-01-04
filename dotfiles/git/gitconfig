@@ -6,10 +6,6 @@
     added = yellow
     changed = green
     untracked = cyan
-[color "diff"]
-    meta = yellow bold
-    frag = magenta bold
-    new = green bold
 [color "branch"]
     current = yellow bold
     local = white
@@ -28,6 +24,8 @@
     pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
 [pager]
     diff = delta
+[delta]
+    line-numbers = true
 [merge]
     conflictstyle = diff3
 [diff]

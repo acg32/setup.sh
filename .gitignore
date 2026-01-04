@@ -4,3 +4,14 @@
 
 # Log files (if you are creating logs in debug mode, uncomment this)
 # *.log
+
+# Local system reports and editor logs
+system-report-latest.txt
+.nvimlog
+
+# Local bin shims from installers (uv/ansible/nvim)
+dotfiles/bin/ansible
+dotfiles/bin/ansible-*
+dotfiles/bin/nvim
+dotfiles/bin/uv
+dotfiles/bin/uvx

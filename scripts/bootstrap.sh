@@ -33,10 +33,13 @@ function setup_uv() {
 
 function setup_ansible() {
     # Bins will be at ~/.local/bin
-    if ! command -v ansible >/dev/null 2>&1; then
+    if ! command -v ansible-playbook >/dev/null 2>&1; then
+        uv tool install ansible-core
+    fi
+    if ! command -v ansible-playbook >/dev/null 2>&1; then
         uv tool install ansible
     fi
-    command -v ansible && ansible --version
+    command -v ansible-playbook && ansible-playbook --version
 }
 
 color() {
