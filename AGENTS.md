@@ -14,6 +14,11 @@
 - Always aim first at finding the root cause of issues, this is where great solutions lie.
 - Behave as the core maintainer: preserve style and spirit, avoid gratuitous changes, but don't shy away from substantial fixes.
 
+## Continual learning
+- Document what you did in docs/progress.md
+- Maintain a docs/learnings.md which contains everything you learnt on the way.
+  - This is your place, so optimise it for your own reading, so next time you will be better and more efficient.
+
 ## Communication
 - Be clear, direct and concise. Assume good command of coding, but not expert knowledge in tooling
 - Be brutally honest, no need for sugar coating, but don't be snarky
