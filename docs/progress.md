@@ -9,3 +9,5 @@
 - Added profile metadata (description, targets, ETA, recommended flag) and rendered a pre-selection profile guide table.
 - Improved execution UX with numbered plan output, selected-profile summary, ETA hint, per-step runtime, and total runtime in final success panel.
 - Kept CLI compatibility for existing automation flags (`--profile`, `--dotfiles`, `--yes`, `--dry-run`).
+- Added custom `questionary` color styling to make interactive selection/confirmation prompts more expressive.
+- Styled prompt UI elements (qmark, question, pointer, highlighted item, selected marker, answer, instruction, disabled text).

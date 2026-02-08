@@ -8,6 +8,7 @@ from time import perf_counter
 from typing import List, Sequence
 
 import questionary
+from prompt_toolkit.styles import Style
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -61,6 +62,20 @@ PROFILE_SPECS = {
         recommended=True,
     ),
 }
+
+QUESTIONARY_STYLE = Style.from_dict(
+    {
+        "qmark": "fg:#ff9e3b bold",
+        "question": "fg:#9ccfd8 bold",
+        "answer": "fg:#a6da95 bold",
+        "pointer": "fg:#f7768e bold",
+        "highlighted": "fg:#f5a97f bold",
+        "selected": "fg:#7dcfff bold",
+        "instruction": "fg:#7aa2f7 italic",
+        "text": "fg:#c0caf5",
+        "disabled": "fg:#6b7089 italic",
+    }
+)
 
 
 def run(cmd: List[str], cwd: str) -> float:
@@ -134,6 +149,8 @@ def select_profile() -> str:
         ],
         qmark="▶",
         pointer="❯",
+        style=QUESTIONARY_STYLE,
+        instruction="(Use ↑/↓ to move, Enter to choose)",
     ).ask()
 
 
@@ -185,6 +202,9 @@ def main() -> None:
         use_dotfiles = questionary.confirm(
             "Apply dotfiles after Ansible? (recommended)",
             default=True,
+            qmark="◆",
+            style=QUESTIONARY_STYLE,
+            instruction="(Y/n)",
         ).ask()
     else:
         use_dotfiles = args.dotfiles
@@ -209,7 +229,13 @@ def main() -> None:
     console.rule("[bold cyan]Execution")
 
     if not args.yes:
-        if not questionary.confirm("Proceed?", default=True).ask():
+        if not questionary.confirm(
+            "Proceed?",
+            default=True,
+            qmark="◆",
+            style=QUESTIONARY_STYLE,
+            instruction="(Y/n)",
+        ).ask():
             console.print("Aborted.", style="yellow")
             return
     if args.dry_run:

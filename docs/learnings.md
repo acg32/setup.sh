@@ -7,3 +7,5 @@
 - `questionary + rich` is already sufficient for a noticeably better setup UX when profile metadata is explicit and shown before prompting.
 - Parsing profile key from display text is brittle; returning typed profile values directly from `questionary.Choice` is safer and simpler.
 - Showing per-step and total runtime gives useful operator feedback during setup without adding heavy dependencies or framework complexity.
+- `questionary` theming can be centralized with `prompt_toolkit` `Style.from_dict(...)`, then reused across `select` and `confirm` for a coherent visual identity.
+- CLI dry-runs do not exercise interactive prompt styling; they still provide a safe behavior regression check for the non-interactive path.
