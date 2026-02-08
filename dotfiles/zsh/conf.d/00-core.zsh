@@ -9,7 +9,6 @@ safe_source() { local file="$1"; [[ -r "$file" ]] && source "$file"; }
 
 # PATH and editor defaults
 typeset -U path PATH
-path=("$HOME/.local/bin" $path)
 export PATH
 
 if has nvim; then
