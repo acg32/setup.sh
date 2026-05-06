@@ -114,10 +114,17 @@
     path: /tmp/nodesource.gpg.key
     state: absent
 
-- name: Add NodeSource repository
+- name: Remove unpinned NodeSource repository
   become: true
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ nodesource_major }}.x nodistro main"
+    filename: nodesource
+    state: absent
+
+- name: Add NodeSource repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ nodesource_major }}.x nodistro main"
     filename: nodesource
     state: present
 

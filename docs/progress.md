@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-05-06
+- Investigated `apt update` warnings from local apt sources.
+- Identified duplicate Docker repository declarations in both `docker.list` and `docker.sources`.
+- Updated the Docker role to remove the legacy `docker.list` file before managing the deb822 source.
+- Updated the dev-tools role to replace the unpinned NodeSource source with an `amd64`-pinned entry for machines with `i386` enabled.
+
 ## 2026-02-08
 - Fixed `make report` by restoring execute permissions on `scripts/system_report.sh`.
 - Removed redundant `~/.local/bin` insertion from `dotfiles/zsh/conf.d/00-core.zsh` to avoid PATH duplication.
