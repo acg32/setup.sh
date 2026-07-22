@@ -1,6 +1,7 @@
 #!/usr/bin/env -S uv run --with rich --with questionary
 import argparse
 import os
+import platform
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -63,6 +64,8 @@ PROFILE_SPECS = {
     ),
 }
 
+SUPPORTED_SYSTEMS = {"Darwin", "Linux"}
+
 QUESTIONARY_STYLE = Style.from_dict(
     {
         "qmark": "fg:#ff9e3b bold",
@@ -120,6 +123,12 @@ def render_profile_guide(console: Console) -> None:
             f"~{spec.eta_minutes}m",
         )
     console.print(table)
+
+
+def platform_targets(targets: Sequence[str], system_name: str) -> Sequence[str]:
+    if system_name == "Darwin":
+        return tuple(target.replace("ansible-", "brew-", 1) for target in targets)
+    return targets
 
 
 def select_profile() -> str:
@@ -181,6 +190,14 @@ def main() -> None:
 
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     console = Console()
+    system_name = platform.system()
+
+    if system_name not in SUPPORTED_SYSTEMS:
+        console.print(
+            f"Unsupported operating system: {system_name or 'unknown'}",
+            style="bold red",
+        )
+        raise SystemExit(1)
 
     console.print(
         Panel.fit(
@@ -197,10 +214,12 @@ def main() -> None:
         profile = select_profile()
 
     selected = PROFILE_SPECS[profile]
+    selected_targets = platform_targets(selected.targets, system_name)
+    package_manager = "Homebrew" if system_name == "Darwin" else "Ansible"
 
     if args.dotfiles is None:
         use_dotfiles = questionary.confirm(
-            "Apply dotfiles after Ansible? (recommended)",
+            "Apply dotfiles after package setup? (recommended)",
             default=True,
             qmark="◆",
             style=QUESTIONARY_STYLE,
@@ -214,8 +233,8 @@ def main() -> None:
     table.add_column("Step")
     table.add_column("Command")
     step_num = 1
-    for target in selected.targets:
-        table.add_row(str(step_num), "Ansible", f"make {target}")
+    for target in selected_targets:
+        table.add_row(str(step_num), package_manager, f"make {target}")
         step_num += 1
     if use_dotfiles:
         table.add_row(str(step_num), "Dotfiles", "make dotfiles")
@@ -225,6 +244,10 @@ def main() -> None:
         f"[dim]Selected profile:[/dim] [bold]{selected.title}[/bold] "
         f"[dim]- {selected.description}[/dim]"
     )
+    if system_name == "Darwin":
+        console.print(
+            "[dim]macOS: GNOME and Linux-only system tuning are intentionally skipped.[/dim]"
+        )
     console.print(f"[dim]Estimated total time:[/dim] ~{eta}m")
     console.rule("[bold cyan]Execution")
 
@@ -244,7 +267,7 @@ def main() -> None:
 
     total_started = perf_counter()
     try:
-        for target in selected.targets:
+        for target in selected_targets:
             console.print(f"[bold yellow]→ Running:[/bold yellow] make {target}")
             elapsed = run(["make", target], cwd=root)
             console.print(

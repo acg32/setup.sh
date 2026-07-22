@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Added Homebrew fzf-tab completion and substring-based history search.
+- Added Homebrew zsh autosuggestions and live syntax highlighting to the macOS UX profile.
+- Added profile-matched Homebrew setup and platform-aware install routing for macOS.
 - Split Ansible playbooks by intent (base, UX, workloads, personal).
 - Consolidated dotfiles and added QoL defaults (rg/fd/bat/less/inputrc).
 - GNOME terminal profile captured and applied via Ansible.

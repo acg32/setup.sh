@@ -1,12 +1,20 @@
 SHELL := /bin/sh
-PATH := $(HOME)/.local/bin:$(PATH)
+PATH := /opt/homebrew/bin:/usr/local/bin:$(HOME)/.local/bin:$(PATH)
+UNAME_S ?= $(shell uname -s)
 
-.PHONY: bootstrap ansible-collections ansible-base ansible-ux ansible-workloads ansible-personal dotfiles verify setup install report
+.PHONY: bootstrap ansible-collections ansible-base ansible-ux ansible-workloads ansible-personal brew-base brew-ux brew-workloads brew-personal dotfiles verify setup install report
 
 ANSIBLE := ansible-playbook --ask-become-pass -e user=$(USER) -i ansible/inventory.ini
 
 bootstrap:
+ifeq ($(UNAME_S),Darwin)
+	./scripts/bootstrap-macos.sh
+else ifeq ($(UNAME_S),Linux)
 	./scripts/bootstrap.sh
+else
+	@echo "Unsupported operating system: $(UNAME_S)" >&2
+	@exit 1
+endif
 
 ansible-collections:
 	ansible-galaxy collection install -r ansible/requirements.yml
@@ -23,8 +31,24 @@ ansible-workloads: ansible-collections
 ansible-personal: ansible-collections
 	$(ANSIBLE) ansible/playbook-personal.yaml
 
+brew-base:
+	brew bundle --file=macos/Brewfile.base
+
+brew-ux:
+	brew bundle --file=macos/Brewfile.ux
+
+brew-workloads:
+	brew bundle --file=macos/Brewfile.workloads
+
+brew-personal:
+	brew bundle --file=macos/Brewfile.personal
+
 dotfiles:
+ifeq ($(UNAME_S),Darwin)
+	$(MAKE) -C dotfiles macos
+else
 	$(MAKE) -C dotfiles install
+endif
 
 verify:
 	$(MAKE) -C dotfiles verify
@@ -34,11 +58,10 @@ report:
 
 setup:
 	@command -v uv >/dev/null 2>&1 || { \
-		echo "uv not found. Run 'make install' or './scripts/bootstrap.sh' first."; \
+		echo "uv not found. Run 'make install' or 'make bootstrap' first."; \
 		exit 1; \
 	}
 	./scripts/setup.py
 
-install:
-	./scripts/bootstrap.sh
+install: bootstrap
 	$(MAKE) setup

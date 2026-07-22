@@ -1,7 +1,7 @@
 [core]
     editor = nvim
     excludesfile = ~/.config/git/ignore
-    pager = less
+	pager = delta
 [color "status"]
     added = yellow
     changed = green
@@ -24,6 +24,8 @@
     pretty = format:%C(yellow)%h %C(cyan)%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
 [pager]
     diff = delta
+	log = delta
+	show = delta
 [delta]
     line-numbers = true
 [merge]

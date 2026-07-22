@@ -27,7 +27,8 @@ make uninstall
 - Optional aliases live in `~/.config/aliases/`.
 - Global ignore file is linked to `~/.config/git/ignore`.
 - Readline defaults are linked to `~/.inputrc`.
-- Tool defaults are linked under `~/.config/` for `rg`, `fd`, `bat`, and `less`.
+- Tool defaults are linked under `~/.config/` for Ghostty, `rg`, `fd`, `bat`, and `less`.
+- Ghostty uses the installed `AdwaitaMono Nerd Font` family.
 - Optional per-machine overrides:
   - `~/.vimrc.local`
   - `~/.config/nvim/init.local.lua`

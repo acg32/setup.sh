@@ -1,5 +1,23 @@
 # Learnings
 
+## 2026-07-22
+- Live typing colors in zsh come from `zsh-syntax-highlighting` (not Starship, not Ghostty theme). Ghost history suggestions are `zsh-autosuggestions`.
+- The original repo wiring exposed both only as Oh My Zsh plugins behind `[[ -d ~/.oh-my-zsh ]]`; direct optional loading now makes the Homebrew setup independent of OMZ.
+- On macOS, prefer Homebrew formulas + direct `source` (no OMZ required): `zsh-syntax-highlighting`, `zsh-autosuggestions`. Caveat: syntax highlighting must be sourced near the end of interactive init.
+- OMZ stock does not include `zsh-syntax-highlighting`, `zsh-autosuggestions`, or `fzf-tab`; those need `custom/plugins/` clones even when OMZ is present. Declaring them in `plugins=(...)` alone is not enough.
+- Ubuntu Ansible (`system-base` / `dev-tools`) also does not install these plugins — same silent gap on Linux unless added manually.
+- `fzf-tab` must load after `compinit`; substring history search must bind the arrow keys after the repo's default prefix-history widgets.
+
+## 2026-07-16
+- Profile-scoped Brewfiles preserve the existing setup vocabulary without making Ubuntu-specific Ansible roles conditional and harder to reason about.
+- Package parity should follow intent rather than names: macOS already provides certificates, OpenSSH, zsh, and compiler tooling, while zram, NVIDIA PRIME, TLP, UFW, and fwupd have no direct package-equivalent.
+- Adding Homebrew's standard prefixes to the root Makefile PATH lets a freshly bootstrapped `uv` run in the same `make install` invocation.
+- Homebrew's fzf formula exposes shell integration under its formula prefix, not Debian's `/usr/share/doc/fzf/examples` path.
+- Homebrew renamed the Docker cask to `docker-desktop`; its general Wine casks are deprecated and scheduled for removal, so Wine is not a durable macOS package mapping.
+- Linking Starship's configuration is insufficient on a fresh machine; the UX package profile must also install the `starship` executable or prompt initialization is skipped.
+- Zsh does not read `.inputrc`; matching readline's prefix-history arrows requires explicit ZLE widgets and `bindkey` mappings.
+- Ghostty supports the XDG path `~/.config/ghostty/config.ghostty` on macOS, which fits the existing portable dotfile layout and backup/link lifecycle.
+
 ## 2026-05-06
 - Docker's deb822 source (`docker.sources`) and legacy one-line source (`docker.list`) describe the same apt targets, so leaving both creates duplicate target warnings for Packages, Translations, DEP-11, icons, and CNF metadata.
 - This laptop has `i386` enabled as a foreign architecture, so third-party repositories that only publish `amd64` packages should be explicitly architecture-pinned to avoid apt acquisition notices.

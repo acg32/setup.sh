@@ -52,6 +52,20 @@ Explicitly NOT here:
 
 ---
 
+### Layer 1b — macOS packages (Homebrew)
+
+Scope:
+- package equivalents for the base, UX, workloads, and personal profiles
+- portable developer applications and CLI tools
+
+Properties:
+- Homebrew Brewfiles grouped by profile
+- no Ansible on macOS
+- built-in macOS tools are not duplicated
+- GNOME and Linux-only system tuning are intentionally skipped
+
+---
+
 ### Layer 2 — User environment (portable dotfiles)
 
 Scope:

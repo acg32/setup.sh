@@ -1,0 +1,9 @@
+brew "curl"
+brew "fzf"
+brew "git"
+brew "gnupg"
+brew "htop"
+brew "tmux"
+brew "tree"
+
+cask "visual-studio-code"

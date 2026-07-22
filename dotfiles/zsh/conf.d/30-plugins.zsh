@@ -31,10 +31,44 @@ if has fzf; then
         esac
     }
 
-    if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+    fzf_prefix=""
+    if has brew; then
+        fzf_prefix="$(brew --prefix fzf 2>/dev/null)"
+    fi
+
+    if [[ -n "$fzf_prefix" && -f "$fzf_prefix/shell/key-bindings.zsh" ]]; then
+        safe_source "$fzf_prefix/shell/key-bindings.zsh"
+    elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
         safe_source /usr/share/doc/fzf/examples/key-bindings.zsh
     fi
-    if [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
+    if [[ -n "$fzf_prefix" && -f "$fzf_prefix/shell/completion.zsh" ]]; then
+        safe_source "$fzf_prefix/shell/completion.zsh"
+    elif [[ -f /usr/share/doc/fzf/examples/completion.zsh ]]; then
         safe_source /usr/share/doc/fzf/examples/completion.zsh
+    fi
+fi
+
+# Completion and history plugins (also work without Oh My Zsh)
+if has brew; then
+    fzf_tab_prefix="$(brew --prefix fzf-tab 2>/dev/null)"
+    history_substring_prefix="$(brew --prefix zsh-history-substring-search 2>/dev/null)"
+    safe_source "$fzf_tab_prefix/share/fzf-tab/fzf-tab.zsh"
+    safe_source "$history_substring_prefix/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    if typeset -f history-substring-search-up >/dev/null 2>&1; then
+        bindkey '^[[A' history-substring-search-up
+        bindkey '^[[B' history-substring-search-down
+    fi
+fi
+
+# Homebrew plugins (also work without Oh My Zsh)
+# Keep syntax highlighting last: it hooks ZLE widgets installed above.
+if has brew; then
+    zsh_autosuggestions_prefix="$(brew --prefix zsh-autosuggestions 2>/dev/null)"
+    zsh_syntax_highlighting_prefix="$(brew --prefix zsh-syntax-highlighting 2>/dev/null)"
+    if ! typeset -f _zsh_autosuggest_start >/dev/null 2>&1; then
+        safe_source "$zsh_autosuggestions_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    fi
+    if ! typeset -f _zsh_highlight >/dev/null 2>&1; then
+        safe_source "$zsh_syntax_highlighting_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
     fi
 fi

@@ -1,0 +1,13 @@
+font-family = "AdwaitaMono Nerd Font"
+font-size = 13
+font-thicken = true
+font-thicken-strength = 80
+
+window-padding-x = 10
+window-padding-y = 8
+window-inherit-working-directory = true
+mouse-hide-while-typing = true
+
+cursor-style = block
+cursor-style-blink = false
+macos-option-as-alt = left

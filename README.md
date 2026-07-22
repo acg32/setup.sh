@@ -1,6 +1,7 @@
 # ✨ Setup (Laptop) ✨
 
-Pragmatic setup for a daily-driver Ubuntu 24+ laptop — clean, fast, and calm.
+Pragmatic setup for Ubuntu 24+ and macOS development machines — clean, fast,
+and calm.
 
 ---
 
@@ -8,12 +9,15 @@ Pragmatic setup for a daily-driver Ubuntu 24+ laptop — clean, fast, and calm.
 ```bash
 make install
 ```
-This runs bootstrap and launches the interactive setup. If `uv` was just installed, open a new shell and rerun `make install`.
+This bootstraps the platform package manager and launches the interactive
+setup. Ubuntu uses Ansible; macOS uses profile-scoped Homebrew Brewfiles and
+skips Linux-only system tuning. On a fresh macOS install, complete the Xcode
+Command Line Tools prompt and rerun `make install`.
 
 ---
 
 ## 🎛️ Common commands
-- `make install`: one-command setup (bootstrap + interactive).
+- `make install`: platform-aware bootstrap + interactive setup.
 - `make setup`: run the interactive profile picker.
 - `make dotfiles`: link dotfiles only.
 - `make verify`: check dotfile symlinks.

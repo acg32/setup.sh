@@ -1,0 +1,16 @@
+brew "bat"
+brew "btop"
+brew "eza"
+brew "fd"
+brew "fzf-tab"
+brew "git-delta"
+brew "jq"
+brew "neovim"
+brew "node@24", link: true
+brew "ripgrep"
+brew "starship"
+brew "zsh-autosuggestions"
+brew "zsh-history-substring-search"
+brew "zsh-syntax-highlighting"
+
+cask "font-fira-code"

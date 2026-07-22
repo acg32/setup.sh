@@ -1,5 +1,19 @@
 # Progress Log
 
+## 2026-07-22
+- Assessed missing live command-line highlighting on this macOS laptop.
+- Confirmed root cause: `30-plugins.zsh` gates highlighting on Oh My Zsh, but OMZ is not installed and Brewfiles do not ship `zsh-syntax-highlighting` / `zsh-autosuggestions`.
+- Added Homebrew formulas and direct, optional loading so the plugins work with or without Oh My Zsh.
+- Added fzf-tab completion and zsh substring history search to the macOS profile and interactive config.
+
+## 2026-07-16
+- Added Homebrew manifests matching the active base, UX, workloads, and personal setup profiles.
+- Routed bootstrap, package targets, and dotfiles by operating system while preserving the Ubuntu Ansible path.
+- Added Homebrew fzf shell integration and documented intentional macOS package differences.
+- Added Starship to the macOS UX manifest so the linked prompt configuration is activated.
+- Added Zsh prefix-history search bindings for the up and down arrow keys.
+- Added a managed Ghostty configuration using AdwaitaMono Nerd Font and pragmatic macOS defaults.
+
 ## 2026-05-06
 - Investigated `apt update` warnings from local apt sources.
 - Identified duplicate Docker repository declarations in both `docker.list` and `docker.sources`.
