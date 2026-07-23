@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 MODE="${1:-full}"
 OS_NAME="$(uname -s)"
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN_NAMES="git-fancy-log git-graph git-logall git-st"
 
 link_file() {
     src="$1"
@@ -23,6 +24,43 @@ seed_gitconfig_local() {
     fi
 }
 
+prepare_local_bin() {
+    local_bin="$HOME/.local/bin"
+
+    # Older installs linked this entire directory into the repository. Move
+    # externally generated tools out before replacing that link.
+    if [ -L "$local_bin" ] && [ "$(readlink "$local_bin")" = "$ROOT/bin" ]; then
+        migration_dir="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-bin.XXXXXX")"
+        for entry in "$ROOT/bin"/*; do
+            [ -e "$entry" ] || [ -L "$entry" ] || continue
+            name="${entry##*/}"
+            case " $BIN_NAMES " in
+                *" $name "*)
+                    ;;
+                *)
+                    mv "$entry" "$migration_dir/$name"
+                    ;;
+            esac
+        done
+        rm "$local_bin"
+        mkdir -p "$local_bin"
+        for entry in "$migration_dir"/*; do
+            [ -e "$entry" ] || [ -L "$entry" ] || continue
+            mv "$entry" "$local_bin/"
+        done
+        rmdir "$migration_dir"
+    else
+        mkdir -p "$local_bin"
+    fi
+}
+
+link_managed_bins() {
+    prepare_local_bin
+    for name in $BIN_NAMES; do
+        link_file "$ROOT/bin/$name" "$HOME/.local/bin/$name"
+    done
+}
+
 install_common() {
     link_file "$ROOT/git/gitconfig" "$HOME/.gitconfig"
     link_file "$ROOT/git/ignore" "$HOME/.config/git/ignore"
@@ -31,7 +69,7 @@ install_common() {
     link_file "$ROOT/zsh/conf.d" "$CONFIG_HOME/zsh/conf.d"
     link_file "$ROOT/vim/vimrc" "$HOME/.vimrc"
     link_file "$ROOT/vim/colors" "$HOME/.vim/colors"
-    link_file "$ROOT/bin" "$HOME/.local/bin"
+    link_managed_bins
     link_file "$ROOT/shellcheckrc" "$HOME/.shellcheckrc"
     link_file "$ROOT/inputrc" "$HOME/.inputrc"
     link_file "$ROOT/editorconfig" "$HOME/.editorconfig"

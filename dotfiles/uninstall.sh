@@ -3,6 +3,7 @@ set -eu
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN_NAMES="git-fancy-log git-graph git-logall git-st"
 
 remove_link() {
     dest="$1"
@@ -37,7 +38,9 @@ fi
 
 remove_link "$HOME/.gitconfig"
 remove_link "$HOME/.config/git/ignore"
-remove_link "$HOME/.local/bin"
+for name in $BIN_NAMES; do
+    remove_link "$HOME/.local/bin/$name"
+done
 remove_link "$HOME/.zshrc"
 remove_link "$HOME/.zshenv"
 remove_link "$CONFIG_HOME/zsh/conf.d"

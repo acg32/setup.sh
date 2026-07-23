@@ -3,6 +3,7 @@ set -eu
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN_NAMES="git-fancy-log git-graph git-logall git-st"
 
 color() {
     code="$1"
@@ -25,7 +26,9 @@ color "1;36" "✨ Dotfiles link check ✨"
 
 check_link "$ROOT/git/gitconfig" "$HOME/.gitconfig"
 check_link "$ROOT/git/ignore" "$HOME/.config/git/ignore"
-check_link "$ROOT/bin" "$HOME/.local/bin"
+for name in $BIN_NAMES; do
+    check_link "$ROOT/bin/$name" "$HOME/.local/bin/$name"
+done
 check_link "$ROOT/zsh/zshrc" "$HOME/.zshrc"
 check_link "$ROOT/zshenv" "$HOME/.zshenv"
 check_link "$ROOT/zsh/conf.d" "$CONFIG_HOME/zsh/conf.d"

@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Changed dotfiles bin installation to link only repository-owned helpers and preserve externally installed tools in `~/.local/bin`.
 - Added Homebrew fzf-tab completion and substring-based history search.
 - Added Homebrew zsh autosuggestions and live syntax highlighting to the macOS UX profile.
 - Added profile-matched Homebrew setup and platform-aware install routing for macOS.

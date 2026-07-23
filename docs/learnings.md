@@ -7,6 +7,7 @@
 - OMZ stock does not include `zsh-syntax-highlighting`, `zsh-autosuggestions`, or `fzf-tab`; those need `custom/plugins/` clones even when OMZ is present. Declaring them in `plugins=(...)` alone is not enough.
 - Ubuntu Ansible (`system-base` / `dev-tools`) also does not install these plugins — same silent gap on Linux unless added manually.
 - `fzf-tab` must load after `compinit`; substring history search must bind the arrow keys after the repo's default prefix-history widgets.
+- Never symlink an entire dotfiles `bin` directory to `~/.local/bin`: installers such as uv and Cursor write there and pollute the repository. Link an explicit allowlist of repository-owned helpers instead.
 
 ## 2026-07-16
 - Profile-scoped Brewfiles preserve the existing setup vocabulary without making Ubuntu-specific Ansible roles conditional and harder to reason about.

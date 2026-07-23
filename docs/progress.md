@@ -5,6 +5,7 @@
 - Confirmed root cause: `30-plugins.zsh` gates highlighting on Oh My Zsh, but OMZ is not installed and Brewfiles do not ship `zsh-syntax-highlighting` / `zsh-autosuggestions`.
 - Added Homebrew formulas and direct, optional loading so the plugins work with or without Oh My Zsh.
 - Added fzf-tab completion and zsh substring history search to the macOS profile and interactive config.
+- Reworked bin installation to link only the four tracked Git helpers and migrated uv/Cursor-generated tools out of the repository.
 
 ## 2026-07-16
 - Added Homebrew manifests matching the active base, UX, workloads, and personal setup profiles.
