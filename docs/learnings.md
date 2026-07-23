@@ -1,6 +1,14 @@
 # Learnings
 
 ## 2026-07-23
+- Duplicated typed characters ("ls" -> "llsls") after enabling
+  zsh-syntax-highlighting = a terminfo mismatch, not a highlighting bug.
+  Highlighting redraws the line each keystroke; if `$TERM` has no terminfo
+  entry, ZLE miscomputes the cursor and duplicates input. Ghostty sets
+  `TERM=xterm-ghostty`, which minimal servers lack. Fall back to
+  `xterm-256color` when `infocmp "$TERM"` fails (guarded by `has infocmp`).
+- Ghostty's standard Forward Delete sequence is `^[[3~`; Zsh leaves it
+  unbound by default, so bind it explicitly to `delete-char`.
 - Starship's Kubernetes module is disabled by default; enable it explicitly and add `$kubernetes` to the prompt format to show the active context.
 - Because `~/.config/zsh/conf.d` is a symlink into the repository, machine-local Zsh snippets need a sibling directory such as `~/.config/zsh/local/`, not another file under `conf.d`.
 - `zsh-history-substring-search` also defines `_zsh_highlight`; use `ZSH_HIGHLIGHT_VERSION` to detect the syntax-highlighting plugin rather than testing that function name.

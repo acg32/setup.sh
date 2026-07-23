@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Fell back to `xterm-256color` in Zsh when the terminal's own terminfo is
+  missing (fixes duplicated input under Ghostty over SSH).
+- Bound the standard terminal Forward Delete sequence in Zsh.
 - Enabled the active Kubernetes context and namespace in the shared Starship prompt.
 - Added an untracked per-machine Zsh configuration directory for credentials and local shell integrations.
 - Fixed macOS Zsh plugin loading when Homebrew cannot reach its package API.

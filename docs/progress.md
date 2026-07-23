@@ -1,6 +1,11 @@
 # Progress Log
 
 ## 2026-07-23
+- Added a Zsh terminfo guard: fall back to `xterm-256color` when the current
+  `$TERM` has no terminfo entry, fixing duplicated input under Ghostty (whose
+  `xterm-ghostty` entry is absent on the VM) once highlighting was enabled.
+- Bound Ghostty's standard Forward Delete sequence (`^[[3~`) to Zsh's
+  `delete-char` widget.
 - Enabled Starship's Kubernetes module for both local and VM shells.
 - Fixed Homebrew Zsh plugin loading to use local `opt/<formula>` paths rather than formula-specific `brew --prefix` lookups, which can fail when Homebrew cannot refresh its API.
 - Moved syntax highlighting to the final Zsh config file so its ZLE hooks are registered after Starship and local overrides.
