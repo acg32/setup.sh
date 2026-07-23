@@ -261,11 +261,17 @@ Result:
 - Ansible is root-only and minimal; `system-base` is the default role.
 - VS Code is enabled by default; additional roles are split across playbooks.
 - Personal/taste roles live in `ansible/playbook-personal.yaml` (wine, retroarch).
+- Ubuntu VMs / cloud boxes use `playbook-vm.yaml` / setup profile `vm`: same
+  tooling (base + CLI/dev-tools) without vscode, Chrome, zram, UFW, Docker,
+  Node/npm, nvidia, GNOME, battery, or firmware. Supported on Ubuntu 24+ and
+  Debian 12+.
 - NVIDIA role installs drivers only; CUDA/cuDNN are intentionally excluded.
 - Battery role uses distro TLP + powertop; Dell tuning is gated by `battery.enable_dell`.
 - GNOME terminal profiles are managed by the `gnome` role via `dconf`.
 - Dotfiles are consolidated into a single tree with a simple `install.sh` and sensible defaults.
 - Preflight checks enforce Ubuntu 24+; playbooks end with a role summary.
+- VM prompt uses `starship.vm.toml` (gruvbox_dark palette + always-on hostname)
+  via `STARSHIP_CONFIG` seeded in `~/.zshenv.local`.
 
 ## Direction (guiding decisions)
 

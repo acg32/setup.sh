@@ -8,6 +8,18 @@
 - Fixed a Zsh plugin function-name collision that prevented syntax highlighting from loading.
 - Added an optional directory-scoped Git identity and config for repositories under `~/work/`.
 - Changed dotfiles bin installation to link only repository-owned helpers and preserve externally installed tools in `~/.local/bin`.
+- Seeded bash→zsh handoff in `~/.bashrc` for Google OS Login VMs (`chsh`
+  cannot change the login shell).
+- VM profile skips zram, UFW, Docker, and Node/npm (plus vscode/Chrome GUI bits).
+- Skipped Google Chrome apt-source arch cleanup on `setup_target=vm`
+  (no GUI browsers on headless VMs; Chrome was never installed by Ansible anyway).
+- Extended `vm` profile to Debian 12+ (Docker repo follows distro); pin local Python interpreter.
+- Made Ansible become prompting skip when passwordless sudo is available (`ASK_BECOME` override).
+- Added Ubuntu `vm` setup profile and `playbook-vm.yaml` (tooling without laptop UX).
+- Added Starship VM theme (`starship.vm.toml`) with gruvbox_dark palette and always-on hostname;
+  `vm` profile seeds `STARSHIP_CONFIG` via `~/.zshenv.local`.
+- Installed Starship from GitHub releases in the Ansible `dev-tools` role.
+- Softened preflight chassis messaging when `setup_target=vm`.
 - Added Homebrew fzf-tab completion and substring-based history search.
 - Added Homebrew zsh autosuggestions and live syntax highlighting to the macOS UX profile.
 - Added profile-matched Homebrew setup and platform-aware install routing for macOS.

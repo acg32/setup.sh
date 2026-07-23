@@ -1,0 +1,15 @@
+---
+- name: Install Debian/Ubuntu VM tooling
+  hosts: all
+  become: true
+  vars_files:
+    - config.yaml
+  vars:
+    nvidia:
+      enable: false
+    setup_target: vm
+  roles:
+    - { role: preflight, tags: [preflight] }
+    - { role: system-base, tags: [base] }
+    - { role: dev-tools, tags: [dev-tools] }
+    - { role: summary, tags: [summary] }

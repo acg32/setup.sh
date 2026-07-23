@@ -26,6 +26,7 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Configure zram generator
   become: true
@@ -33,11 +34,13 @@
     src: zram-generator.conf.j2
     dest: /etc/systemd/zram-generator.conf
     mode: '0644'
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Reload systemd for zram config
   become: true
   ansible.builtin.systemd_service:
     daemon_reload: true
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Ensure zram service is running
   become: true
@@ -45,18 +48,21 @@
     name: systemd-zram-setup@zram0.service
     enabled: true
     state: started
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Check Google Chrome apt source list
   become: true
   ansible.builtin.stat:
     path: /etc/apt/sources.list.d/google-chrome.list
   register: google_chrome_list
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Check Google Chrome deb822 source
   become: true
   ansible.builtin.stat:
     path: /etc/apt/sources.list.d/google-chrome.sources
   register: google_chrome_sources
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Force amd64 for Google Chrome repo when i386 is enabled
   become: true
@@ -64,7 +70,9 @@
     path: /etc/apt/sources.list.d/google-chrome.list
     regexp: '^deb\\s+(?!\\[arch=)'
     replace: 'deb [arch=amd64] '
-  when: google_chrome_list.stat.exists
+  when:
+    - (setup_target | default('laptop')) != "vm"
+    - google_chrome_list.stat.exists | default(false)
 
 - name: Force amd64 for Google Chrome deb822 repo when i386 is enabled
   become: true
@@ -73,4 +81,6 @@
     regexp: '^Architectures:'
     line: 'Architectures: amd64'
     insertafter: '^Types:'
-  when: google_chrome_sources.stat.exists
+  when:
+    - (setup_target | default('laptop')) != "vm"
+    - google_chrome_sources.stat.exists | default(false)

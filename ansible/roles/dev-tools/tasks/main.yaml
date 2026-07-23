@@ -86,6 +86,7 @@
     path: /etc/apt/keyrings
     state: directory
     mode: "0755"
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Fetch NodeSource signing key
   become: true
@@ -93,6 +94,7 @@
     url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
     dest: /tmp/nodesource.gpg.key
     mode: "0644"
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Ensure gpg is available for keyring install
   become: true
@@ -101,18 +103,21 @@
     state: present
     update_cache: true
     cache_valid_time: 3600
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Install NodeSource signing keyring
   become: true
   ansible.builtin.command: gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg /tmp/nodesource.gpg.key
   args:
     creates: /etc/apt/keyrings/nodesource.gpg
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Remove temporary NodeSource key
   become: true
   ansible.builtin.file:
     path: /tmp/nodesource.gpg.key
     state: absent
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Remove unpinned NodeSource repository
   become: true
@@ -120,6 +125,7 @@
     repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ nodesource_major }}.x nodistro main"
     filename: nodesource
     state: absent
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Add NodeSource repository
   become: true
@@ -127,6 +133,7 @@
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ nodesource_major }}.x nodistro main"
     filename: nodesource
     state: present
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Install optional CLI tools
   become: true
@@ -151,25 +158,30 @@
     state: latest
     update_cache: true
     cache_valid_time: 3600
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Read Node.js version
   ansible.builtin.command: node --version
   register: node_version
   changed_when: false
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Parse Node.js version
   ansible.builtin.set_fact:
     node_version_clean: "{{ node_version.stdout | regex_replace('^v', '') }}"
     node_major: "{{ node_version.stdout | regex_replace('^v', '') | split('.') | first | int }}"
     node_minor: "{{ (node_version.stdout | regex_replace('^v', '') | split('.'))[1] | int }}"
+  when: (setup_target | default('laptop')) != "vm"
 
 - name: Update npm to latest
   become: true
   ansible.builtin.command: npm install -g npm@latest
-  when: >-
-    (node_major == 20 and node_minor >= 17) or
-    (node_major > 22) or
-    (node_major == 22 and node_minor >= 9)
+  when:
+    - (setup_target | default('laptop')) != "vm"
+    - >
+      (node_major == 20 and node_minor >= 17) or
+      (node_major > 22) or
+      (node_major == 22 and node_minor >= 9)
 
 - name: Resolve delta architecture
   ansible.builtin.set_fact:
@@ -179,3 +191,24 @@
   become: true
   ansible.builtin.apt:
     deb: "https://github.com/dandavison/delta/releases/download/{{ delta_version }}/git-delta_{{ delta_version }}_{{ delta_arch }}.deb"
+
+- name: Resolve starship architecture
+  ansible.builtin.set_fact:
+    starship_arch: "{{ starship_arch_map[ansible_architecture] | default('x86_64') }}"
+
+- name: Download starship release archive
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/starship/starship/releases/download/v{{ starship_version }}/starship-{{ starship_arch }}-unknown-linux-musl.tar.gz"
+    dest: "/tmp/starship-{{ starship_version }}.tar.gz"
+    mode: "0644"
+
+- name: Extract starship binary into /usr/local/bin
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/starship-{{ starship_version }}.tar.gz"
+    dest: "{{ starship_install_dir }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"

@@ -7,6 +7,31 @@
 - `zsh-syntax-highlighting` must be sourced after every other ZLE-using configuration, including prompt frameworks and local overrides; loading it earlier can leave its library present without live highlighting.
 - Calling `brew --prefix <formula>` from an interactive shell can trigger Homebrew API refreshes and fail in restricted networks. Resolve the Homebrew root once, then use its stable `opt/<formula>` symlinks to source installed plugins without network access.
 
+- Google OS Login users are not in `/etc/passwd`, so `chsh` fails. Login
+  shell stays `/bin/bash`. Fix: seed `~/.bashrc` with an interactive
+  `exec /usr/bin/zsh -l` handoff (vm profile via setup.py).
+- Cloud VMs: skip zram, host UFW, Docker, and Node/npm unless needed; keep
+  CLI tooling (rg/fd/bat/starship/nvim). GCP VPC/IAP already firewalls.
+- This onboarding VM is Debian 13, not Ubuntu. Laptop playbooks stay
+  Ubuntu-only; `setup_target=vm` preflight must accept Debian 12+ or the
+  profile is unusable on GCP Debian images. Docker apt URIs must use
+  `linux/debian` (not ubuntu) when `ansible_distribution` is Debian.
+- `--ask-become-pass` is for the *sudo* password, not SSH. GCP/IAP VMs often
+  have NOPASSWD sudo; prompting then is useless. Detect with `sudo -n true`
+  and skip the flag (override via `ASK_BECOME`).
+- Ubuntu Ansible never installed Starship; linking `starship.toml` alone left
+  `40-prompt.zsh` as a silent no-op. Install the binary in `dev-tools` (same
+  lesson as macOS Brewfile.ux).
+- VM vs laptop prompt cue: keep one layout, switch via `STARSHIP_CONFIG` + a
+  second toml (`palette` + `$hostname` with `ssh_only = false`). Seed
+  `~/.zshenv.local` (sourced from `zshenv` before prompt init) — not
+  `~/.zshrc.local`, which loads in `90-local.zsh` after Starship init.
+  Ansible stays out of user taste.
+- `playbook-vm.yaml` should set nested `nvidia.enable: false` under `vars`
+  (dotted key literals do not override `config.yaml` maps).
+- Preflight chassis warnings are laptop bias; for `setup_target=vm` treat
+  non-laptop chassis as expected, not scary.
+
 ## 2026-07-22
 - Live typing colors in zsh come from `zsh-syntax-highlighting` (not Starship, not Ghostty theme). Ghost history suggestions are `zsh-autosuggestions`.
 - The original repo wiring exposed both only as Oh My Zsh plugins behind `[[ -d ~/.oh-my-zsh ]]`; direct optional loading now makes the Homebrew setup independent of OMZ.

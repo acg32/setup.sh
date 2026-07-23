@@ -7,6 +7,22 @@
 - Corrected the syntax-highlighting guard: history-substring-search defines an unrelated `_zsh_highlight` function.
 - Added `~/.config/zsh/local/` for machine-specific Zsh snippets and credentials outside the dotfiles repository.
 
+- Seeded bash→zsh handoff for Google OS Login (login shell stays bash; `chsh`
+  cannot change NSS users).
+- Allowed Debian 12+ (and Ubuntu 24+) on the `vm` profile; Docker repo URI
+  follows `ansible_distribution`. Pinned local inventory to `/usr/bin/python3`.
+- Made Ansible become prompting conditional: skip `--ask-become-pass` when
+  `sudo -n` succeeds (typical GCP/cloud VMs); override with `ASK_BECOME=0|1`.
+- Added Ubuntu VM setup path: `playbook-vm.yaml`, Makefile `ansible-vm`, and
+  setup profile `vm` (system-base + CLI/dev-tools; skips vscode, Chrome, zram,
+  UFW, Docker, and Node/npm).
+- Added `starship.vm.toml` (gruvbox_dark palette + always-on hostname) and seed
+  `STARSHIP_CONFIG` into `~/.zshenv.local` for the vm profile (zshenv loads
+  before `40-prompt.zsh`; `~/.zshrc.local` would be too late).
+- Installed Starship via GitHub release in Ansible `dev-tools` so Ubuntu prompt
+  init stops silently no-oping when only the config was linked.
+- Softened preflight non-laptop chassis messaging when `setup_target=vm`.
+
 ## 2026-07-22
 - Assessed missing live command-line highlighting on this macOS laptop.
 - Confirmed root cause: `30-plugins.zsh` gates highlighting on Oh My Zsh, but OMZ is not installed and Brewfiles do not ship `zsh-syntax-highlighting` / `zsh-autosuggestions`.

@@ -1,1 +1,7 @@
 export PATH="$HOME/.local/bin:$PATH"
+
+# Per-machine early overrides (e.g. STARSHIP_CONFIG for VM theme)
+if [ -f "$HOME/.zshenv.local" ]; then
+    # shellcheck disable=SC1090,SC1091
+    . "$HOME/.zshenv.local"
+fi

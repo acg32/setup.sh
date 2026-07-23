@@ -1,10 +1,45 @@
 ---
-- name: Assert Ubuntu 24+ host
+- name: Assert Ubuntu 24+ host (laptop playbooks)
   ansible.builtin.assert:
     that:
       - ansible_facts.distribution == "Ubuntu"
       - ansible_facts.distribution_version is version("24.04", ">=")
     fail_msg: "This playbook targets Ubuntu 24+ only."
+  when: (setup_target | default("laptop")) != "vm"
+
+- name: Assert supported VM host (Ubuntu 24+ or Debian 12+)
+  ansible.builtin.assert:
+    that:
+      - >
+        (ansible_facts.distribution == "Ubuntu"
+         and ansible_facts.distribution_version is version("24.04", ">="))
+        or
+        (ansible_facts.distribution == "Debian"
+         and ansible_facts.distribution_major_version is version("12", ">="))
+    fail_msg: "VM playbook targets Ubuntu 24+ or Debian 12+."
+  when: (setup_target | default("laptop")) == "vm"
+
+- name: Note expected non-laptop chassis for VM target
+  ansible.builtin.debug:
+    msg: >-
+      setup_target=vm: non-laptop chassis is expected
+      ({{ chassis_list | join(', ') | default('unknown') }}).
+  vars:
+    laptop_types:
+      - Laptop
+      - Notebook
+      - Portable
+      - Detachable
+      - Convertible
+    chassis_raw: "{{ ansible_facts.get('chassis_type', []) }}"
+    chassis_list: >-
+      {{
+        [chassis_raw] if chassis_raw is string
+        else chassis_raw
+      }}
+  when:
+    - (setup_target | default('laptop')) == "vm"
+    - (chassis_list | intersect(laptop_types) | length) == 0
 
 - name: Warn if chassis type does not look like a laptop
   ansible.builtin.debug:
@@ -22,4 +57,6 @@
         [chassis_raw] if chassis_raw is string
         else chassis_raw
       }}
-  when: (chassis_list | intersect(laptop_types) | length) == 0
+  when:
+    - (setup_target | default('laptop')) != "vm"
+    - (chassis_list | intersect(laptop_types) | length) == 0

@@ -2,9 +2,12 @@ SHELL := /bin/sh
 PATH := /opt/homebrew/bin:/usr/local/bin:$(HOME)/.local/bin:$(PATH)
 UNAME_S ?= $(shell uname -s)
 
-.PHONY: bootstrap ansible-collections ansible-base ansible-ux ansible-workloads ansible-personal brew-base brew-ux brew-workloads brew-personal dotfiles verify setup install report
+.PHONY: bootstrap ansible-collections ansible-base ansible-ux ansible-workloads ansible-personal ansible-vm brew-base brew-ux brew-workloads brew-personal dotfiles verify setup install report
 
-ANSIBLE := ansible-playbook --ask-become-pass -e user=$(USER) -i ansible/inventory.ini
+# Prompt for sudo unless passwordless sudo works, or ASK_BECOME=0 is set.
+ASK_BECOME ?= $(shell sudo -n true >/dev/null 2>&1 && echo 0 || echo 1)
+ANSIBLE_BECOME_FLAG := $(if $(filter 1,$(ASK_BECOME)),--ask-become-pass,)
+ANSIBLE := ansible-playbook $(ANSIBLE_BECOME_FLAG) -e user=$(USER) -i ansible/inventory.ini
 
 bootstrap:
 ifeq ($(UNAME_S),Darwin)
@@ -30,6 +33,9 @@ ansible-workloads: ansible-collections
 
 ansible-personal: ansible-collections
 	$(ANSIBLE) ansible/playbook-personal.yaml
+
+ansible-vm: ansible-collections
+	$(ANSIBLE) ansible/playbook-vm.yaml
 
 brew-base:
 	brew bundle --file=macos/Brewfile.base

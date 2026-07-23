@@ -1,6 +1,6 @@
 # Docker role
 > [!WARNING]
-> This role only works on **Ubuntu 22.04**
+> This role works on **Ubuntu** and **Debian** (apt repo URI follows the distro).
 
 Role to set up Docker and needed tools.
 

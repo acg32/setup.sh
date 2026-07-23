@@ -19,6 +19,7 @@ Command Line Tools prompt and rerun `make install`.
 ## 🎛️ Common commands
 - `make install`: platform-aware bootstrap + interactive setup.
 - `make setup`: run the interactive profile picker.
+- `make ansible-vm`: Ubuntu VM tooling (no laptop UX).
 - `make dotfiles`: link dotfiles only.
 - `make verify`: check dotfile symlinks.
 

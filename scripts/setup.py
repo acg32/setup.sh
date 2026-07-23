@@ -54,6 +54,13 @@ PROFILE_SPECS = {
         targets=("ansible-personal",),
         eta_minutes=7,
     ),
+    "vm": ProfileSpec(
+        key="vm",
+        title="VM",
+        description="VM tooling on Ubuntu 24+ or Debian 12+ (no laptop UX)",
+        targets=("ansible-vm",),
+        eta_minutes=12,
+    ),
     "full": ProfileSpec(
         key="full",
         title="Full",
@@ -87,6 +94,40 @@ def run(cmd: List[str], cwd: str) -> float:
     return perf_counter() - started
 
 
+VM_STARSHIP_MARKER = "# setup.sh vm profile"
+VM_STARSHIP_BLOCK = """# setup.sh vm profile
+export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.vm.toml"
+"""
+
+VM_ZSH_HANDOFF_MARKER = "# setup.sh vm profile: zsh handoff"
+VM_ZSH_HANDOFF_BLOCK = """# setup.sh vm profile: zsh handoff
+# Google OS Login keeps /bin/bash as the login shell; chsh cannot change it.
+if [ -t 1 ] && [ -z "${ZSH_VERSION:-}" ] && [ -x /usr/bin/zsh ]; then
+  export SHELL=/usr/bin/zsh
+  exec /usr/bin/zsh -l
+fi
+"""
+
+
+def _append_seed_block(path: str, marker: str, block: str) -> bool:
+    """Append block to path if marker is absent. Returns True if written."""
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8") as handle:
+            existing = handle.read()
+        if marker in existing:
+            return False
+        with open(path, "a", encoding="utf-8") as handle:
+            if existing and not existing.endswith("\n"):
+                handle.write("\n")
+            handle.write(block)
+            if not block.endswith("\n"):
+                handle.write("\n")
+    else:
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(block)
+    return True
+
+
 def ensure_git_pagers(console: Console) -> None:
     if shutil.which("git") is None:
         return
@@ -104,6 +145,32 @@ def ensure_git_pagers(console: Console) -> None:
             updated = True
     if updated:
         console.print("[bold green]✓ Fixed Git pager config[/bold green]")
+
+
+def ensure_vm_starship_config(console: Console) -> None:
+    # STARSHIP_CONFIG must be set before starship init (40-prompt.zsh), so seed
+    # ~/.zshenv.local (sourced from zshenv) rather than ~/.zshrc.local (90-local).
+    local_env = os.path.expanduser("~/.zshenv.local")
+    if _append_seed_block(local_env, VM_STARSHIP_MARKER, VM_STARSHIP_BLOCK):
+        console.print(
+            "[bold green]✓ Seeded VM Starship config in ~/.zshenv.local[/bold green]"
+        )
+    else:
+        console.print(
+            "[dim]VM Starship config already present in ~/.zshenv.local[/dim]"
+        )
+
+
+def ensure_vm_zsh_handoff(console: Console) -> None:
+    # OS Login / NSS users are not in /etc/passwd, so chsh cannot set zsh.
+    # Hand off from interactive bash (SSH default) into zsh instead.
+    bashrc = os.path.expanduser("~/.bashrc")
+    if _append_seed_block(bashrc, VM_ZSH_HANDOFF_MARKER, VM_ZSH_HANDOFF_BLOCK):
+        console.print(
+            "[bold green]✓ Seeded bash→zsh handoff in ~/.bashrc[/bold green]"
+        )
+    else:
+        console.print("[dim]bash→zsh handoff already present in ~/.bashrc[/dim]")
 
 
 def render_profile_guide(console: Console) -> None:
@@ -138,6 +205,10 @@ def select_profile() -> str:
             questionary.Choice(
                 title="full      Base + UX + workloads (recommended)",
                 value="full",
+            ),
+            questionary.Choice(
+                title="vm        VM tooling (Ubuntu 24+ / Debian 12+, no laptop UX)",
+                value="vm",
             ),
             questionary.Choice(
                 title="base      Core system baseline and packages",
@@ -213,6 +284,13 @@ def main() -> None:
         render_profile_guide(console)
         profile = select_profile()
 
+    if profile == "vm" and system_name != "Linux":
+        console.print(
+            "The vm profile targets Ubuntu 24+ or Debian 12+ only.",
+            style="bold red",
+        )
+        raise SystemExit(1)
+
     selected = PROFILE_SPECS[profile]
     selected_targets = platform_targets(selected.targets, system_name)
     package_manager = "Homebrew" if system_name == "Darwin" else "Ansible"
@@ -247,6 +325,11 @@ def main() -> None:
     if system_name == "Darwin":
         console.print(
             "[dim]macOS: GNOME and Linux-only system tuning are intentionally skipped.[/dim]"
+        )
+    if profile == "vm":
+        console.print(
+            "[dim]VM: skips vscode, Chrome, zram, UFW, Docker, Node/npm, nvidia, "
+            "GNOME, battery, and firmware; seeds Starship VM theme.[/dim]"
         )
     console.print(f"[dim]Estimated total time:[/dim] ~{eta}m")
     console.rule("[bold cyan]Execution")
@@ -283,6 +366,9 @@ def main() -> None:
                 f"[dim]({elapsed:.1f}s)[/dim]"
             )
             ensure_git_pagers(console)
+            if profile == "vm":
+                ensure_vm_starship_config(console)
+                ensure_vm_zsh_handoff(console)
     except subprocess.CalledProcessError as exc:
         console.print(
             Panel.fit(
