@@ -1,6 +1,7 @@
 # Learnings
 
 ## 2026-07-23
+- Starship's Kubernetes module is disabled by default; enable it explicitly and add `$kubernetes` to the prompt format to show the active context.
 - Because `~/.config/zsh/conf.d` is a symlink into the repository, machine-local Zsh snippets need a sibling directory such as `~/.config/zsh/local/`, not another file under `conf.d`.
 - `zsh-history-substring-search` also defines `_zsh_highlight`; use `ZSH_HIGHLIGHT_VERSION` to detect the syntax-highlighting plugin rather than testing that function name.
 - `zsh-syntax-highlighting` must be sourced after every other ZLE-using configuration, including prompt frameworks and local overrides; loading it earlier can leave its library present without live highlighting.

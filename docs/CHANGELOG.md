@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Enabled the active Kubernetes context and namespace in the shared Starship prompt.
 - Added an untracked per-machine Zsh configuration directory for credentials and local shell integrations.
 - Fixed macOS Zsh plugin loading when Homebrew cannot reach its package API.
 - Fixed Zsh syntax highlighting hook order after prompt and local configuration.
