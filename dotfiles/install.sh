@@ -67,6 +67,7 @@ install_common() {
     link_file "$ROOT/zsh/zshrc" "$HOME/.zshrc"
     link_file "$ROOT/zshenv" "$HOME/.zshenv"
     link_file "$ROOT/zsh/conf.d" "$CONFIG_HOME/zsh/conf.d"
+    mkdir -p "$CONFIG_HOME/zsh/local"
     link_file "$ROOT/vim/vimrc" "$HOME/.vimrc"
     link_file "$ROOT/vim/colors" "$HOME/.vim/colors"
     link_managed_bins

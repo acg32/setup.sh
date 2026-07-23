@@ -1,6 +1,11 @@
 # Changelog
 
 ## Unreleased
+- Added an untracked per-machine Zsh configuration directory for credentials and local shell integrations.
+- Fixed macOS Zsh plugin loading when Homebrew cannot reach its package API.
+- Fixed Zsh syntax highlighting hook order after prompt and local configuration.
+- Fixed a Zsh plugin function-name collision that prevented syntax highlighting from loading.
+- Added an optional directory-scoped Git identity and config for repositories under `~/work/`.
 - Changed dotfiles bin installation to link only repository-owned helpers and preserve externally installed tools in `~/.local/bin`.
 - Added Homebrew fzf-tab completion and substring-based history search.
 - Added Homebrew zsh autosuggestions and live syntax highlighting to the macOS UX profile.

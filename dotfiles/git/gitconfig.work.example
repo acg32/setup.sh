@@ -1,0 +1,11 @@
+[user]
+    name = Your Work Name
+    email = you@company.example
+
+# Add employer-specific Git settings here. This file is loaded only for
+# repositories under ~/work/ and remains outside the dotfiles repository.
+#
+# [user]
+#     signingkey = YOUR_WORK_SIGNING_KEY
+# [commit]
+#     gpgsign = true

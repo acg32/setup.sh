@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-07-23
+- Fixed Homebrew Zsh plugin loading to use local `opt/<formula>` paths rather than formula-specific `brew --prefix` lookups, which can fail when Homebrew cannot refresh its API.
+- Moved syntax highlighting to the final Zsh config file so its ZLE hooks are registered after Starship and local overrides.
+- Corrected the syntax-highlighting guard: history-substring-search defines an unrelated `_zsh_highlight` function.
+- Added `~/.config/zsh/local/` for machine-specific Zsh snippets and credentials outside the dotfiles repository.
+
 ## 2026-07-22
 - Assessed missing live command-line highlighting on this macOS laptop.
 - Confirmed root cause: `30-plugins.zsh` gates highlighting on Oh My Zsh, but OMZ is not installed and Brewfiles do not ship `zsh-syntax-highlighting` / `zsh-autosuggestions`.

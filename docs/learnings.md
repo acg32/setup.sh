@@ -1,5 +1,11 @@
 # Learnings
 
+## 2026-07-23
+- Because `~/.config/zsh/conf.d` is a symlink into the repository, machine-local Zsh snippets need a sibling directory such as `~/.config/zsh/local/`, not another file under `conf.d`.
+- `zsh-history-substring-search` also defines `_zsh_highlight`; use `ZSH_HIGHLIGHT_VERSION` to detect the syntax-highlighting plugin rather than testing that function name.
+- `zsh-syntax-highlighting` must be sourced after every other ZLE-using configuration, including prompt frameworks and local overrides; loading it earlier can leave its library present without live highlighting.
+- Calling `brew --prefix <formula>` from an interactive shell can trigger Homebrew API refreshes and fail in restricted networks. Resolve the Homebrew root once, then use its stable `opt/<formula>` symlinks to source installed plugins without network access.
+
 ## 2026-07-22
 - Live typing colors in zsh come from `zsh-syntax-highlighting` (not Starship, not Ghostty theme). Ghost history suggestions are `zsh-autosuggestions`.
 - The original repo wiring exposed both only as Oh My Zsh plugins behind `[[ -d ~/.oh-my-zsh ]]`; direct optional loading now makes the Homebrew setup independent of OMZ.

@@ -8,6 +8,11 @@ if [[ -d "$HOME/.oh-my-zsh" ]]; then
 fi
 
 # fzf integration (optional)
+brew_prefix="${HOMEBREW_PREFIX:-}"
+if [[ -z "$brew_prefix" ]] && has brew; then
+    brew_prefix="$(brew --prefix 2>/dev/null || true)"
+fi
+
 if has fzf; then
     if has rg; then
         export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git/*"'
@@ -31,10 +36,7 @@ if has fzf; then
         esac
     }
 
-    fzf_prefix=""
-    if has brew; then
-        fzf_prefix="$(brew --prefix fzf 2>/dev/null)"
-    fi
+    fzf_prefix="${brew_prefix:+$brew_prefix/opt/fzf}"
 
     if [[ -n "$fzf_prefix" && -f "$fzf_prefix/shell/key-bindings.zsh" ]]; then
         safe_source "$fzf_prefix/shell/key-bindings.zsh"
@@ -49,9 +51,9 @@ if has fzf; then
 fi
 
 # Completion and history plugins (also work without Oh My Zsh)
-if has brew; then
-    fzf_tab_prefix="$(brew --prefix fzf-tab 2>/dev/null)"
-    history_substring_prefix="$(brew --prefix zsh-history-substring-search 2>/dev/null)"
+if [[ -n "$brew_prefix" ]]; then
+    fzf_tab_prefix="$brew_prefix/opt/fzf-tab"
+    history_substring_prefix="$brew_prefix/opt/zsh-history-substring-search"
     safe_source "$fzf_tab_prefix/share/fzf-tab/fzf-tab.zsh"
     safe_source "$history_substring_prefix/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
     if typeset -f history-substring-search-up >/dev/null 2>&1; then
@@ -60,15 +62,10 @@ if has brew; then
     fi
 fi
 
-# Homebrew plugins (also work without Oh My Zsh)
-# Keep syntax highlighting last: it hooks ZLE widgets installed above.
-if has brew; then
-    zsh_autosuggestions_prefix="$(brew --prefix zsh-autosuggestions 2>/dev/null)"
-    zsh_syntax_highlighting_prefix="$(brew --prefix zsh-syntax-highlighting 2>/dev/null)"
+# Homebrew autosuggestions (also work without Oh My Zsh)
+if [[ -n "$brew_prefix" ]]; then
+    zsh_autosuggestions_prefix="$brew_prefix/opt/zsh-autosuggestions"
     if ! typeset -f _zsh_autosuggest_start >/dev/null 2>&1; then
         safe_source "$zsh_autosuggestions_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    fi
-    if ! typeset -f _zsh_highlight >/dev/null 2>&1; then
-        safe_source "$zsh_syntax_highlighting_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
     fi
 fi
