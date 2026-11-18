@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-11-18
+- Added a Tailscale-served share on the cloud dev VM: one root, one folder per project, auto-generated index page.
+  `scripts/share` (installed as `~/bin/share` on the VM) manages projects, live apps (own HTTPS port) and the index;
+  `publish <project> <file|dir>...` (`dotfiles/zsh/conf.d/65-share.zsh`) rsyncs from the laptop and prints the URLs.
+  Per-machine `SHARE_VM` (ssh alias) lives in `~/.config/zsh/local/share.zsh`, outside the repo.
+- Registered the trainjob dashboard (:8765 -> https :8443) and the PR tracker (:8790 -> https :10000) as live apps.
+- Fixed stale `/home/...` paths and the linux-amd64 binary in the opencode MCP config copied from the Linux VM.
+- Not verified: behaviour after a VM reboot (relies on `tailscale serve --bg` persistence and the tmux sessions).
+
 ## 2026-07-23
 - Added a Zsh terminfo guard: fall back to `xterm-256color` when the current
   `$TERM` has no terminfo entry, fixing duplicated input under Ghostty (whose

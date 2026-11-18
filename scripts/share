@@ -1,0 +1,318 @@
+#!/usr/bin/env python3
+"""share: manage the Tailscale-served share root (~/share) and its index page.
+
+  share init                          make sure the root and registered apps are served, rebuild the index
+  share index                         rebuild ~/share/index.html
+  share ls                            list projects and apps
+  share host                          print the tailnet hostname the share is served on
+  share meta PROJECT [--title T] [--desc D]
+  share rm PROJECT [PATH]             delete a project (or one file inside it)
+  share app add NAME PORT [--title T] [--desc D] [--https-port N]
+  share app rm NAME
+  share app ls
+
+Static projects are plain folders: ~/share/<project>/...  ->  https://<host>/<project>/...
+Apps are local web servers (127.0.0.1:PORT) exposed on their own HTTPS port, because most apps
+use absolute asset paths and cannot live under a sub-path. Tailscale Serve allows 443, 8443, 10000.
+"""
+import argparse
+import json
+import re
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+from urllib.parse import quote
+
+ROOT = Path.home() / "share"
+CONF = Path.home() / ".config" / "share" / "projects.json"
+APP_HTTPS_PORTS = [8443, 10000]
+NAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+MAX_FILES = 500
+
+
+def load():
+    if CONF.exists():
+        return json.loads(CONF.read_text())
+    return {"projects": {}, "apps": {}}
+
+
+def save(conf):
+    CONF.parent.mkdir(parents=True, exist_ok=True)
+    CONF.write_text(json.dumps(conf, indent=2, sort_keys=True) + "\n")
+
+
+def host():
+    out = subprocess.run(["tailscale", "status", "--json"], capture_output=True, text=True, check=True).stdout
+    return json.loads(out)["Self"]["DNSName"].rstrip(".")
+
+
+def ts(*args):
+    r = subprocess.run(["tailscale", *args], capture_output=True, text=True)
+    if r.returncode and "sudo" in (r.stderr + r.stdout):
+        r = subprocess.run(["sudo", "-n", "tailscale", *args], capture_output=True, text=True)
+    if r.returncode:
+        sys.exit(f"tailscale {' '.join(args)} failed:\n{r.stderr or r.stdout}")
+    return r.stdout
+
+
+def check_name(name):
+    if not NAME_RE.match(name) or name == "index.html":
+        sys.exit(f"invalid name {name!r}: use lowercase letters, digits, '.', '_' or '-'")
+
+
+def scan(d):
+    files = []
+    for p in sorted(d.rglob("*")):
+        rel = p.relative_to(d)
+        if p.is_file() and not any(part.startswith(".") for part in rel.parts):
+            st = p.stat()
+            files.append({"p": rel.as_posix(), "s": st.st_size, "m": int(st.st_mtime)})
+    files.sort(key=lambda f: -f["m"])
+    return files
+
+
+def build_index():
+    ROOT.mkdir(parents=True, exist_ok=True)
+    conf = load()
+    h = host()
+    projects = []
+    for d in sorted(ROOT.iterdir()):
+        if not d.is_dir() or d.name.startswith(".") or not NAME_RE.match(d.name):
+            continue
+        files = scan(d)
+        if not files:
+            continue
+        meta = conf["projects"].get(d.name, {})
+        projects.append({
+            "name": d.name,
+            "title": meta.get("title") or d.name,
+            "description": meta.get("description", ""),
+            "url": f"{quote(d.name)}/",
+            "has_index": (d / "index.html").exists(),
+            "count": len(files),
+            "updated": files[0]["m"],
+            "files": [{**f, "u": f"{quote(d.name)}/{quote(f['p'])}"} for f in files[:MAX_FILES]],
+        })
+    projects.sort(key=lambda p: -p["updated"])
+    apps = [
+        {"name": n, "title": a.get("title") or n, "description": a.get("description", ""),
+         "url": f"https://{h}:{a['https_port']}/" if a["https_port"] != 443 else f"https://{h}/"}
+        for n, a in sorted(conf["apps"].items())
+    ]
+    data = {"host": h, "generated": int(time.time()), "projects": projects, "apps": apps}
+    blob = json.dumps(data).replace("</", "<\\/")
+    (ROOT / "index.html").write_text(TEMPLATE.replace("__DATA__", blob))
+    print(f"index: {len(projects)} projects, {len(apps)} apps -> https://{h}/")
+
+
+def cmd_init(_):
+    ROOT.mkdir(parents=True, exist_ok=True)
+    ts("serve", "--bg", str(ROOT))
+    for n, a in load()["apps"].items():
+        ts("serve", "--bg", f"--https={a['https_port']}", f"http://127.0.0.1:{a['port']}")
+    build_index()
+
+
+def cmd_ls(_):
+    conf = load()
+    h = host()
+    for d in sorted(ROOT.iterdir()):
+        if d.is_dir() and not d.name.startswith("."):
+            print(f"project  https://{h}/{d.name}/  ({len(scan(d))} files)")
+    for n, a in sorted(conf["apps"].items()):
+        print(f"app      https://{h}:{a['https_port']}/  <- 127.0.0.1:{a['port']}  [{n}]")
+
+
+def cmd_meta(a):
+    check_name(a.project)
+    conf = load()
+    m = conf["projects"].setdefault(a.project, {})
+    if a.title is not None:
+        m["title"] = a.title
+    if a.desc is not None:
+        m["description"] = a.desc
+    save(conf)
+    build_index()
+
+
+def cmd_rm(a):
+    check_name(a.project)
+    base = (ROOT / a.project).resolve()
+    target = (base / a.path).resolve() if a.path else base
+    if base.parent != ROOT.resolve() or (target != base and base not in target.parents):
+        sys.exit("refusing to delete outside the project")
+    if not target.exists():
+        sys.exit(f"{target} does not exist")
+    shutil.rmtree(target) if target.is_dir() else target.unlink()
+    if target == base:
+        conf = load()
+        conf["projects"].pop(a.project, None)
+        save(conf)
+    build_index()
+
+
+def cmd_app_add(a):
+    check_name(a.name)
+    conf = load()
+    used = {x["https_port"] for n, x in conf["apps"].items() if n != a.name}
+    port = a.https_port or next((p for p in APP_HTTPS_PORTS if p not in used), None)
+    if port is None or port in used or port not in APP_HTTPS_PORTS:
+        sys.exit(f"no free HTTPS port (Tailscale Serve allows {APP_HTTPS_PORTS}; used: {sorted(used)})")
+    ts("serve", "--bg", f"--https={port}", f"http://127.0.0.1:{a.port}")
+    old = conf["apps"].get(a.name, {})
+    conf["apps"][a.name] = {
+        "port": a.port, "https_port": port,
+        "title": a.title if a.title is not None else old.get("title", ""),
+        "description": a.desc if a.desc is not None else old.get("description", ""),
+    }
+    save(conf)
+    build_index()
+    print(f"app {a.name}: https://{host()}:{port}/")
+
+
+def cmd_app_rm(a):
+    conf = load()
+    app = conf["apps"].pop(a.name, None)
+    if not app:
+        sys.exit(f"no such app {a.name!r}")
+    ts("serve", f"--https={app['https_port']}", "off")
+    save(conf)
+    build_index()
+
+
+def main():
+    ap = argparse.ArgumentParser(prog="share", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("init").set_defaults(fn=cmd_init)
+    sub.add_parser("index").set_defaults(fn=lambda _: build_index())
+    sub.add_parser("ls").set_defaults(fn=cmd_ls)
+    sub.add_parser("host").set_defaults(fn=lambda _: print(host()))
+    p = sub.add_parser("meta")
+    p.add_argument("project")
+    p.add_argument("--title")
+    p.add_argument("--desc")
+    p.set_defaults(fn=cmd_meta)
+    p = sub.add_parser("rm")
+    p.add_argument("project")
+    p.add_argument("path", nargs="?")
+    p.set_defaults(fn=cmd_rm)
+    app = sub.add_parser("app").add_subparsers(dest="appcmd", required=True)
+    p = app.add_parser("add")
+    p.add_argument("name")
+    p.add_argument("port", type=int)
+    p.add_argument("--title")
+    p.add_argument("--desc")
+    p.add_argument("--https-port", type=int)
+    p.set_defaults(fn=cmd_app_add)
+    p = app.add_parser("rm")
+    p.add_argument("name")
+    p.set_defaults(fn=cmd_app_rm)
+    app.add_parser("ls").set_defaults(fn=cmd_ls)
+    a = ap.parse_args()
+    a.fn(a)
+
+
+TEMPLATE = r"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antoine's share</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1c2330;--muted:#6b7686;--line:#e4e7ec;--accent:#4f46e5;--live:#16a34a}
+@media(prefers-color-scheme:dark){:root{--bg:#0f131a;--card:#171c26;--fg:#e6e9ef;--muted:#8b95a5;--line:#262d3a;--accent:#8b8cf8;--live:#4ade80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+main{max-width:1000px;margin:0 auto;padding:32px 20px 64px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;margin-bottom:24px}
+h1{margin:0;font-size:26px}
+.sub{color:var(--muted);font-size:13px}
+input[type=search]{width:260px;max-width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit}
+h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:32px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card h3{margin:0 0 2px;font-size:16px;display:flex;gap:8px;align-items:center}
+.desc{color:var(--muted);font-size:13px;margin:0 0 6px}
+.badge{font-size:11px;padding:1px 8px;border-radius:99px;border:1px solid var(--live);color:var(--live)}
+.meta{color:var(--muted);font-size:12px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--muted);font-size:13px}
+ul.files{list-style:none;margin:6px 0 0;padding:0;font-size:13px}
+ul.files li{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-top:1px solid var(--line)}
+ul.files a{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ul.files span{color:var(--muted);white-space:nowrap;font-size:12px}
+.more{background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 0;font:inherit;font-size:13px}
+.empty{color:var(--muted);padding:24px 0}
+footer{margin-top:40px;color:var(--muted);font-size:12px}
+code{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><h1>Antoine's share</h1><div class="sub" id="sub"></div></div>
+  <input type="search" id="q" placeholder="Filter projects and files…" autofocus>
+</header>
+<div id="out"></div>
+<footer id="foot"></footer>
+</main>
+<script>
+const D = __DATA__;
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ago = t => { const s = Date.now()/1000 - t;
+  if (s < 90) return "just now"; if (s < 5400) return Math.round(s/60) + " min ago";
+  if (s < 129600) return Math.round(s/3600) + " h ago"; if (s < 2592000) return Math.round(s/86400) + " d ago";
+  return new Date(t*1000).toISOString().slice(0,10); };
+const size = n => n < 1024 ? n + " B" : n < 1048576 ? (n/1024).toFixed(0) + " KB" : (n/1048576).toFixed(1) + " MB";
+const when = t => `<span title="${new Date(t*1000).toLocaleString()}">${ago(t)}</span>`;
+const fileRow = (f, prefix="") => `<li><a href="${f.u}">${esc(prefix + f.p)}</a><span>${size(f.s)} · ${when(f.m)}</span></li>`;
+const LIMIT = 8;
+
+function render() {
+  const q = $("#q").value.trim().toLowerCase();
+  const hit = (...xs) => !q || xs.some(x => x.toLowerCase().includes(q));
+  let html = "";
+  const apps = D.apps.filter(a => hit(a.name, a.title, a.description));
+  if (apps.length) html += `<h2>Live apps</h2><div class="grid">` + apps.map(a =>
+    `<div class="card"><h3><a href="${a.url}">${esc(a.title)}</a><span class="badge">live</span></h3>
+     <p class="desc">${esc(a.description)}</p><div class="meta">${esc(a.url.replace("https://",""))}</div></div>`).join("") + `</div>`;
+
+  const projects = D.projects.map(p => {
+    const all = hit(p.name, p.title, p.description);
+    return {...p, files: all ? p.files : p.files.filter(f => hit(f.p)), shown: all || p.files.some(f => hit(f.p))};
+  }).filter(p => p.shown);
+
+  if (!q) {
+    const recent = D.projects.flatMap(p => p.files.map(f => ({...f, p: f.p, proj: p.name}))).sort((a,b) => b.m - a.m).slice(0, 6);
+    if (recent.length) html += `<h2>Recently updated</h2><div class="card"><ul class="files" style="margin:0">` +
+      recent.map(f => fileRow(f, f.proj + "/")).join("") + `</ul></div>`;
+  }
+
+  if (projects.length) {
+    html += `<h2>Projects</h2><div class="grid">` + projects.map(p => {
+      const open = q ? p.files : p.files.slice(0, LIMIT);
+      return `<div class="card"><h3><a href="${p.url}">${esc(p.title)}</a></h3>
+        <p class="desc">${esc(p.description)}</p>
+        <div class="meta">${p.count} file${p.count > 1 ? "s" : ""} · updated ${when(p.updated)}${p.has_index ? ` · <a href="${p.url}">open</a>` : ""}</div>
+        <details${q ? " open" : ""}><summary>Files</summary><ul class="files">${open.map(f => fileRow(f)).join("")}</ul>
+        ${p.files.length > open.length ? `<a class="more" href="${p.url}">all ${p.count} files →</a>` : ""}</details></div>`;
+    }).join("") + `</div>`;
+  }
+  if (!apps.length && !projects.length) html = `<div class="empty">Nothing matches “${esc(q)}”.</div>`;
+  $("#out").innerHTML = html;
+}
+
+$("#sub").textContent = `${D.host} · tailnet only · updated ${new Date(D.generated*1000).toLocaleString()}`;
+$("#foot").innerHTML = `Publish from the laptop: <code>publish &lt;project&gt; &lt;files…&gt;</code> · manage on the VM with <code>share ls</code>`;
+$("#q").addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
+"""
+
+if __name__ == "__main__":
+    main()

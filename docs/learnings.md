@@ -1,5 +1,13 @@
 # Learnings
 
+## 2026-11-18
+- `tailscale serve` of a *path* needs root even after `tailscale set --operator=$USER`; proxying a port does not. `scripts/share` retries with `sudo -n`.
+- Tailscale Serve only allows HTTPS ports 443, 8443 and 10000, so at most two live apps next to the root share. Apps with absolute asset paths (`/static/...`) cannot be mounted under a sub-path.
+- First HTTPS request to a fresh `*.ts.net` name can hang ~30s while the certificate is issued; retry before debugging.
+- zsh: `"$vm:share/x"` is parsed as the `:s` history modifier ("bad substitution"). Write `"${vm}:share/x"`.
+- `~/.zshrc` is a symlink into this repo: `sed -i` fails on it on macOS, and anything appended (e.g. installers adding PATH lines) lands in the repo as uncommitted changes.
+- Non-interactive `ssh host cmd` does not have `~/bin` on PATH on the VM; call tools by full path.
+
 ## 2026-07-23
 - Duplicated typed characters ("ls" -> "llsls") after enabling
   zsh-syntax-highlighting = a terminfo mismatch, not a highlighting bug.
