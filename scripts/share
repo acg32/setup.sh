@@ -7,13 +7,14 @@
   share host                          print the tailnet hostname the share is served on
   share meta PROJECT [--title T] [--desc D]
   share rm PROJECT [PATH]             delete a project (or one file inside it)
-  share app add NAME PORT [--title T] [--desc D] [--https-port N]
+  share app add NAME PORT [--title T] [--desc D] [--own-port [--https-port N]]
   share app rm NAME
   share app ls
 
 Static projects are plain folders: ~/share/<project>/...  ->  https://<host>/<project>/...
-Apps are local web servers (127.0.0.1:PORT) exposed on their own HTTPS port, because most apps
-use absolute asset paths and cannot live under a sub-path. Tailscale Serve allows 443, 8443, 10000.
+Apps are local web servers (127.0.0.1:PORT). By default they are mounted at https://<host>/<name>/
+(the prefix is stripped before proxying, so the app must use relative URLs). Apps that insist on
+absolute asset paths get --own-port: a dedicated HTTPS port (Tailscale Serve allows 8443 and 10000).
 """
 import argparse
 import json
@@ -57,6 +58,27 @@ def ts(*args):
     return r.stdout
 
 
+def app_url(h, name, app):
+    if app.get("mode", "port") == "path":
+        return f"https://{h}/{quote(name)}/"
+    return f"https://{h}:{app['https_port']}/"
+
+
+def serve_app(name, app):
+    target = f"http://127.0.0.1:{app['port']}"
+    if app.get("mode", "port") == "path":
+        ts("serve", "--bg", f"--set-path=/{name}", target)
+    else:
+        ts("serve", "--bg", f"--https={app['https_port']}", target)
+
+
+def unserve_app(name, app):
+    if app.get("mode", "port") == "path":
+        ts("serve", f"--set-path=/{name}", "off")
+    else:
+        ts("serve", f"--https={app['https_port']}", "off")
+
+
 def check_name(name):
     if not NAME_RE.match(name) or name == "index.html":
         sys.exit(f"invalid name {name!r}: use lowercase letters, digits, '.', '_' or '-'")
@@ -81,6 +103,9 @@ def build_index():
     for d in sorted(ROOT.iterdir()):
         if not d.is_dir() or d.name.startswith(".") or not NAME_RE.match(d.name):
             continue
+        if conf["apps"].get(d.name, {}).get("mode") == "path":
+            print(f"warning: folder ~/share/{d.name} is shadowed by the app of the same name", file=sys.stderr)
+            continue
         files = scan(d)
         if not files:
             continue
@@ -97,8 +122,7 @@ def build_index():
         })
     projects.sort(key=lambda p: -p["updated"])
     apps = [
-        {"name": n, "title": a.get("title") or n, "description": a.get("description", ""),
-         "url": f"https://{h}:{a['https_port']}/" if a["https_port"] != 443 else f"https://{h}/"}
+        {"name": n, "title": a.get("title") or n, "description": a.get("description", ""), "url": app_url(h, n, a)}
         for n, a in sorted(conf["apps"].items())
     ]
     data = {"host": h, "generated": int(time.time()), "projects": projects, "apps": apps}
@@ -111,7 +135,7 @@ def cmd_init(_):
     ROOT.mkdir(parents=True, exist_ok=True)
     ts("serve", "--bg", str(ROOT))
     for n, a in load()["apps"].items():
-        ts("serve", "--bg", f"--https={a['https_port']}", f"http://127.0.0.1:{a['port']}")
+        serve_app(n, a)
     build_index()
 
 
@@ -122,7 +146,7 @@ def cmd_ls(_):
         if d.is_dir() and not d.name.startswith("."):
             print(f"project  https://{h}/{d.name}/  ({len(scan(d))} files)")
     for n, a in sorted(conf["apps"].items()):
-        print(f"app      https://{h}:{a['https_port']}/  <- 127.0.0.1:{a['port']}  [{n}]")
+        print(f"app      {app_url(h, n, a)}  <- 127.0.0.1:{a['port']}  [{n}]")
 
 
 def cmd_meta(a):
@@ -156,20 +180,29 @@ def cmd_rm(a):
 def cmd_app_add(a):
     check_name(a.name)
     conf = load()
-    used = {x["https_port"] for n, x in conf["apps"].items() if n != a.name}
-    port = a.https_port or next((p for p in APP_HTTPS_PORTS if p not in used), None)
-    if port is None or port in used or port not in APP_HTTPS_PORTS:
-        sys.exit(f"no free HTTPS port (Tailscale Serve allows {APP_HTTPS_PORTS}; used: {sorted(used)})")
-    ts("serve", "--bg", f"--https={port}", f"http://127.0.0.1:{a.port}")
-    old = conf["apps"].get(a.name, {})
-    conf["apps"][a.name] = {
-        "port": a.port, "https_port": port,
-        "title": a.title if a.title is not None else old.get("title", ""),
-        "description": a.desc if a.desc is not None else old.get("description", ""),
+    old = conf["apps"].get(a.name)
+    app = {
+        "port": a.port,
+        "title": a.title if a.title is not None else (old or {}).get("title", ""),
+        "description": a.desc if a.desc is not None else (old or {}).get("description", ""),
     }
+    if a.own_port or a.https_port:
+        used = {x["https_port"] for n, x in conf["apps"].items() if n != a.name and x.get("mode", "port") == "port"}
+        port = a.https_port or next((p for p in APP_HTTPS_PORTS if p not in used), None)
+        if port is None or port in used or port not in APP_HTTPS_PORTS:
+            sys.exit(f"no free HTTPS port (Tailscale Serve allows {APP_HTTPS_PORTS}; used: {sorted(used)})")
+        app.update(mode="port", https_port=port)
+    else:
+        if (ROOT / a.name).exists():
+            sys.exit(f"~/share/{a.name} exists: pick another name or run `share rm {a.name}` first")
+        app["mode"] = "path"
+    if old:
+        unserve_app(a.name, old)
+    serve_app(a.name, app)
+    conf["apps"][a.name] = app
     save(conf)
     build_index()
-    print(f"app {a.name}: https://{host()}:{port}/")
+    print(f"app {a.name}: {app_url(host(), a.name, app)}")
 
 
 def cmd_app_rm(a):
@@ -177,7 +210,7 @@ def cmd_app_rm(a):
     app = conf["apps"].pop(a.name, None)
     if not app:
         sys.exit(f"no such app {a.name!r}")
-    ts("serve", f"--https={app['https_port']}", "off")
+    unserve_app(a.name, app)
     save(conf)
     build_index()
 
@@ -204,7 +237,8 @@ def main():
     p.add_argument("port", type=int)
     p.add_argument("--title")
     p.add_argument("--desc")
-    p.add_argument("--https-port", type=int)
+    p.add_argument("--own-port", action="store_true", help="dedicated HTTPS port instead of a /<name>/ mount")
+    p.add_argument("--https-port", type=int, help="with --own-port: 8443 or 10000")
     p.set_defaults(fn=cmd_app_add)
     p = app.add_parser("rm")
     p.add_argument("name")

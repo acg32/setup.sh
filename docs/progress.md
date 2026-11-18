@@ -7,6 +7,8 @@
   Per-machine `SHARE_VM` (ssh alias) lives in `~/.config/zsh/local/share.zsh`, outside the repo.
 - Registered the trainjob dashboard (:8765 -> https :8443) and the PR tracker (:8790 -> https :10000) as live apps.
 - Fixed stale `/home/...` paths and the linux-amd64 binary in the opencode MCP config copied from the Linux VM.
+- Apps now mount at `/<name>/` by default (`share app add NAME PORT`); `--own-port` keeps the dedicated 8443/10000 HTTPS port
+  for apps with absolute asset paths (trainjob). PR tracker moved to `/pr-tracker/` after making its `fetch` calls relative; no restart needed.
 - Not verified: behaviour after a VM reboot (relies on `tailscale serve --bg` persistence and the tmux sessions).
 
 ## 2026-07-23

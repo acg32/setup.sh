@@ -7,6 +7,7 @@
 - zsh: `"$vm:share/x"` is parsed as the `:s` history modifier ("bad substitution"). Write `"${vm}:share/x"`.
 - `~/.zshrc` is a symlink into this repo: `sed -i` fails on it on macOS, and anything appended (e.g. installers adding PATH lines) lands in the repo as uncommitted changes.
 - Non-interactive `ssh host cmd` does not have `~/bin` on PATH on the VM; call tools by full path.
+- `tailscale serve --set-path=/x http://127.0.0.1:P` strips `/x` before proxying (backend sees `/`) and does not redirect `/x` to `/x/`. Apps must use relative URLs; derive the base from `location.pathname` (add a trailing `/` if missing).
 
 ## 2026-07-23
 - Duplicated typed characters ("ls" -> "llsls") after enabling
